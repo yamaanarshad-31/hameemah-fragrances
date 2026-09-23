@@ -1,5 +1,20 @@
 import { useId } from "react";
 
+/** Fits the product name on the 76-unit label: one line if short, otherwise two balanced lines. */
+function labelLines(name: string) {
+  const n = name.toUpperCase();
+  if (n.length <= 13) return [n];
+  const words = n.split(" ");
+  let best = [n.slice(0, 14), n.slice(14, 28)];
+  let bestLen = Infinity;
+  for (let i = 1; i < words.length; i++) {
+    const a = words.slice(0, i).join(" "), b = words.slice(i).join(" ");
+    const worst = Math.max(a.length, b.length);
+    if (worst < bestLen) { bestLen = worst; best = [a, b]; }
+  }
+  return best.map((l) => (l.length > 17 ? l.slice(0, 16) + "…" : l));
+}
+
 /**
  * Hand-drawn perfume bottle used whenever a product has no uploaded photo.
  * `color` is the juice colour, `shape` picks one of four silhouettes.
@@ -63,10 +78,12 @@ export function Bottle({ color = "#b8860b", shape = 0, name, className }: { colo
       {/* label */}
       <g transform={`translate(100 ${k === 2 ? 204 : 200})`}>
         <rect x="-38" y="-30" width="76" height="60" rx="3" fill="#06140d" fillOpacity=".82" stroke={`url(#au${id})`} strokeWidth="1.4" />
-        <text y="4" textAnchor="middle" fontFamily="Georgia, serif" fontSize="26" fill={`url(#au${id})`}>H</text>
-        <text y="21" textAnchor="middle" fontFamily="Georgia, serif" fontSize="6.2" letterSpacing="1.4" fill="#f3dc8f">
-          {(name || "HAMEEMAH").toUpperCase().slice(0, 18)}
-        </text>
+        <text y={name && name.length > 13 ? 0 : 4} textAnchor="middle" fontFamily="Georgia, serif" fontSize="26" fill={`url(#au${id})`}>H</text>
+        {labelLines(name || "Hameemah").map((line, i, all) => (
+          <text key={i} y={all.length > 1 ? 15.5 + i * 7.5 : 21} textAnchor="middle" fontFamily="Georgia, serif" fontSize={all.length > 1 ? 5.4 : 6.2} letterSpacing={all.length > 1 ? 0.9 : 1.4} fill="#f3dc8f">
+            {line}
+          </text>
+        ))}
       </g>
 
       {/* neck + cap */}

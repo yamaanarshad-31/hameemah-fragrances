@@ -4,9 +4,9 @@ import * as s from "./schema";
 
 export const DEFAULT_SETTINGS: Record<string, string> = {
   announcement: "Free delivery on orders above Rs. 5,000 | Cash on Delivery all over Pakistan | Use code WELCOME10 for 10% off",
-  whatsapp: "923000000000",
-  phone: "0300 0000000",
-  email: "hello@fragrancesbyhameemah.com",
+  whatsapp: "923001234567",
+  phone: "0300 1234567",
+  email: "info@fragrancesbyhameemah.com",
   instagram: "https://instagram.com/",
   facebook: "https://facebook.com/",
   tiktok: "https://tiktok.com/",
@@ -15,7 +15,7 @@ export const DEFAULT_SETTINGS: Record<string, string> = {
   heroTitle: "Wear a scent they'll remember",
   heroSubtitle: "Long-lasting luxury perfumes, crafted in small batches and delivered to your door across Pakistan.",
   city: "Pakistan",
-  bankDetails: "Bank: (add your bank name)\nAccount title: Fragrances by Hameemah\nAccount / IBAN: (add in Admin → Settings)\nJazzCash / Easypaisa: 0300 0000000",
+  bankDetails: "Bank: (add your bank name)\nAccount title: Fragrances by Hameemah\nAccount / IBAN: (add in Admin → Settings)\nJazzCash / Easypaisa: 0300 1234567",
 };
 
 const v = (a: number, b: number, c: number, sale = 0): s.Variant[] => [
