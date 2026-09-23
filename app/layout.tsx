@@ -14,6 +14,11 @@ export const metadata: Metadata = {
   description:
     "Shop long-lasting luxury perfumes, oud and attars from Fragrances by Hameemah. Cash on delivery and fast shipping all over Pakistan.",
   applicationName: "Fragrances by Hameemah",
+  keywords: ["perfume Pakistan", "best perfume in Pakistan", "oud perfume", "attar", "long lasting perfume", "perfume for men", "perfume for women", "Fragrances by Hameemah"],
+  alternates: { canonical: "/" },
+  openGraph: { type: "website", siteName: "Fragrances by Hameemah", locale: "en_PK" },
+  twitter: { card: "summary_large_image" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = { themeColor: "#0a2a1c" };

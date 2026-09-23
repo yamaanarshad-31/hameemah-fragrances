@@ -1,8 +1,19 @@
 import type { NextConfig } from "next";
 
+const security = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+];
+
 const nextConfig: NextConfig = {
   serverExternalPackages: ["@libsql/client", "libsql"],
   images: { formats: ["image/avif", "image/webp"] },
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: "/:path*", headers: security }];
+  },
 };
 
 export default nextConfig;

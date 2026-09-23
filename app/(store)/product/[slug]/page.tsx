@@ -19,7 +19,8 @@ export async function generateMetadata({ params }: PageProps<"/product/[slug]">)
     title: `${p.name} — ${p.tagline}`,
     description: `${p.name}: ${p.description?.slice(0, 120)} From Rs. ${price.toLocaleString()} with cash on delivery across Pakistan.`,
     alternates: { canonical: `/product/${p.slug}` },
-    openGraph: { type: "website", title: p.name, description: p.tagline ?? undefined, images: p.images[0] ? [p.images[0]] : undefined },
+    openGraph: { type: "website", title: `${p.name} | Fragrances by Hameemah`, description: p.tagline ?? undefined, url: `/product/${p.slug}`, images: [p.images[0] ?? "/opengraph-image.jpg"] },
+    twitter: { card: "summary_large_image", images: [p.images[0] ?? "/opengraph-image.jpg"] },
   };
 }
 
