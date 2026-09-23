@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Banknote, Landmark, Lock, Tag } from "lucide-react";
 import { useCart } from "./cart";
@@ -23,7 +23,7 @@ function Field({ label, name, error, ...rest }: { label: string; name: string; e
 
 export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: number; freeOver: number; bank: string }) {
   const router = useRouter();
-  const { lines, subtotal, clear, ready } = useCart();
+  const { lines, subtotal, clear, ready, reprice } = useCart();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [payment, setPayment] = useState<"cod" | "bank">("cod");
   const [code, setCode] = useState("");
@@ -31,6 +31,17 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
   const [couponMsg, setCouponMsg] = useState("");
   const [pending, start] = useTransition();
   const [checking, startCheck] = useTransition();
+
+  // the bag keeps the price from when an item was added; refresh it so the total shown is what gets charged
+  const ids = [...new Set(lines.map((l) => l.productId))].join(",");
+  useEffect(() => {
+    if (!ready || !ids) return;
+    fetch(`/api/products?ids=${ids}`).then((r) => r.json()).then((list: { id: number; variants: { size: string; price: number }[] }[]) => {
+      const prices: Record<string, number> = {};
+      for (const p of list) for (const v of p.variants) prices[`${p.id}|${v.size}`] = v.price;
+      reprice(prices);
+    }).catch(() => {});
+  }, [ready, ids, reprice]);
 
   const discount = coupon ? Math.round((subtotal * coupon.percent) / 100) : 0;
   const shipping = freeOver && subtotal - discount >= freeOver ? 0 : shippingFee;
@@ -42,7 +53,10 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
     else { setCoupon(null); setCouponMsg(r.msg); }
   });
 
-  const submit = (fd: FormData) => start(async () => {
+  const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    start(async () => {
     const r = await placeOrder({
       name: String(fd.get("name")), phone: String(fd.get("phone")), email: String(fd.get("email") || ""),
       city: String(fd.get("city")), address: String(fd.get("address")), note: String(fd.get("note") || ""),
@@ -52,7 +66,8 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
     if (!r.ok) { setErrors(r.errors); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
     clear();
     router.push(`/order/${r.orderNo}?new=1`);
-  });
+    });
+  };
 
   if (!ready) return <div className="h-96 animate-pulse rounded-[2rem] bg-cream-2/60" />;
   if (!lines.length && !pending)
@@ -64,7 +79,7 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
     );
 
   return (
-    <form action={submit} className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
+    <form onSubmit={submit} noValidate={false} className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
       <div className="space-y-8">
         {errors.items && <p className="rounded-xl bg-red-50 p-4 text-red-800">{errors.items}</p>}
         <section>

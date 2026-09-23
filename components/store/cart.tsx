@@ -20,7 +20,8 @@ type Ctx = {
   subtotal: number;
   open: boolean;
   setOpen: (v: boolean) => void;
-  add: (l: CartLine) => void;
+  add: (l: CartLine, openDrawer?: boolean) => void;
+  reprice: (prices: Record<string, number>) => void;
   setQty: (productId: number, size: string, qty: number) => void;
   remove: (productId: number, size: string) => void;
   clear: () => void;
@@ -68,19 +69,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     window.setTimeout(() => setToast((t) => (t === msg ? null : t)), 2600);
   }, []);
 
-  const add = useCallback((l: CartLine) => {
+  const add = useCallback((l: CartLine, openDrawer = true) => {
     setLines((prev) => {
       const i = prev.findIndex((x) => x.productId === l.productId && x.size === l.size);
       if (i === -1) return [...prev, l];
       const next = [...prev];
-      next[i] = { ...next[i], qty: Math.min(99, next[i].qty + l.qty), price: l.price };
+      next[i] = { ...next[i], qty: Math.min(20, next[i].qty + l.qty), price: l.price };
       return next;
     });
-    setOpen(true);
+    if (openDrawer) setOpen(true);
+  }, []);
+
+  /** prices keyed by `${productId}|${size}`; lines no longer on sale are dropped */
+  const reprice = useCallback((prices: Record<string, number>) => {
+    setLines((prev) => prev.filter((l) => prices[`${l.productId}|${l.size}`] !== undefined).map((l) => ({ ...l, price: prices[`${l.productId}|${l.size}`] })));
   }, []);
 
   const setQty = useCallback((productId: number, size: string, qty: number) => {
-    setLines((prev) => prev.map((x) => (x.productId === productId && x.size === size ? { ...x, qty: Math.max(1, Math.min(99, qty)) } : x)));
+    setLines((prev) => prev.map((x) => (x.productId === productId && x.size === size ? { ...x, qty: Math.max(1, Math.min(20, qty)) } : x)));
   }, []);
   const remove = useCallback((productId: number, size: string) => {
     setLines((prev) => prev.filter((x) => !(x.productId === productId && x.size === size)));
@@ -93,8 +99,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<Ctx>(() => {
     const count = lines.reduce((a, l) => a + l.qty, 0);
     const subtotal = lines.reduce((a, l) => a + l.qty * l.price, 0);
-    return { lines, ready: loaded, count, subtotal, open, setOpen, add, setQty, remove, clear, wishlist, toggleWish, toast, notify };
-  }, [lines, loaded, open, add, setQty, remove, clear, wishlist, toggleWish, toast, notify]);
+    return { lines, ready: loaded, count, subtotal, open, setOpen, add, reprice, setQty, remove, clear, wishlist, toggleWish, toast, notify };
+  }, [lines, loaded, open, add, reprice, setQty, remove, clear, wishlist, toggleWish, toast, notify]);
 
   return <CartCtx.Provider value={value}>{children}</CartCtx.Provider>;
 }

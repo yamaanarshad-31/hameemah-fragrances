@@ -1,5 +1,6 @@
 "use server";
 import { z } from "zod";
+import { randomBytes } from "node:crypto";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { getDb, schema as s } from "@/lib/db";
 import { getSettings } from "@/lib/data";
@@ -45,7 +46,7 @@ const orderSchema = z.object({
   note: z.string().trim().max(300).default(""),
   payment: z.enum(["cod", "bank"]).default("cod"),
   coupon: z.string().trim().max(30).default(""),
-  items: z.array(z.object({ productId: z.number().int(), size: z.string().max(30), qty: z.number().int().min(1).max(20) })).min(1, "Your bag is empty").max(30),
+  items: z.array(z.object({ productId: z.number().int(), size: z.string().max(30), qty: z.number().int().min(1).max(20, "You can order up to 20 of one item — for bulk orders please WhatsApp us") })).min(1, "Your bag is empty").max(30),
 });
 
 export type PlaceOrderInput = z.input<typeof orderSchema>;
@@ -56,6 +57,7 @@ export async function placeOrder(input: PlaceOrderInput) {
   if (!parsed.success) {
     const errors: Record<string, string> = {};
     for (const i of parsed.error.issues) errors[String(i.path[0])] ??= i.message;
+    if (errors.items && !errors.items.includes(" ")) errors.items = "Please check the items in your bag.";
     return { ok: false as const, errors };
   }
   const d = parsed.data;
@@ -86,7 +88,8 @@ export async function placeOrder(input: PlaceOrderInput) {
   const freeOver = Number(st.freeShippingOver) || 0;
   const shipping = freeOver && subtotal - discount >= freeOver ? 0 : fee;
   const total = subtotal - discount + shipping;
-  const orderNo = "HF-" + Date.now().toString(36).toUpperCase().slice(-5) + Math.random().toString(36).slice(2, 4).toUpperCase();
+  const ABC = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const orderNo = "HF-" + Array.from(randomBytes(7), (b) => ABC[b % ABC.length]).join("");
 
   await db.insert(s.orders).values({
     orderNo, name: d.name, phone: d.phone, email: d.email, city: d.city, address: d.address, note: d.note,

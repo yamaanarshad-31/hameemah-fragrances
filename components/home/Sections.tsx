@@ -115,20 +115,20 @@ export function ReviewWall({ reviews }: { reviews: Rev[] }) {
 export function GiftBand() {
   return (
     <section className="px-5 lg:px-8">
-      <div className="grain relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-emerald px-8 py-16 text-cream sm:px-14 lg:py-20">
+      <div className="grain relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-emerald px-6 py-16 text-cream sm:px-14 lg:py-20">
         <div className="absolute -right-20 -top-20 size-96 rounded-full bg-gold/20 blur-3xl" />
-        <div className="relative grid items-center gap-10 lg:grid-cols-2">
+        <div className="relative grid grid-cols-[minmax(0,1fr)] items-center gap-10 lg:grid-cols-2">
           <Reveal>
             <p className="eyebrow flex items-center gap-2 text-gold"><Gift className="size-4" /> The perfect gift</p>
             <h2 className="mt-4 font-display text-5xl leading-tight sm:text-6xl">Gift boxes that <i className="text-gold-shine">say it all</i></h2>
             <p className="mt-4 max-w-md text-cream/70">Four bestsellers in travel sizes, wrapped in our green-and-gold keepsake box. Add a handwritten note at checkout — we&apos;ll do the rest.</p>
             <Link href="/collections/gift-sets" className="btn-gold mt-8 inline-flex rounded-full px-8 py-4 text-sm font-bold uppercase tracking-[0.2em]">Shop gift sets</Link>
           </Reveal>
-          <div className="relative flex h-72 items-end justify-center gap-2 sm:h-80">
+          <div className="relative flex h-60 items-end justify-center gap-1 sm:h-80 sm:gap-2">
             {[["#5a2d0c", 0], ["#0f5132", 1], ["#b0415b", 2], ["#8a1f11", 3]].map(([c, s], i) => (
               <Reveal key={i} delay={0.15 * i} y={80}>
                 <div className="animate-float" style={{ animationDelay: `${i * 0.6}s` }}>
-                  <Bottle color={c as string} shape={s as number} className={`w-auto drop-shadow-[0_25px_25px_rgba(0,0,0,.45)] ${i % 3 === 0 ? "h-56 sm:h-64" : "h-44 sm:h-52"}`} />
+                  <Bottle color={c as string} shape={s as number} className={`w-auto drop-shadow-[0_25px_25px_rgba(0,0,0,.45)] ${i % 3 === 0 ? "h-44 sm:h-64" : "h-36 sm:h-52"}`} />
                 </div>
               </Reveal>
             ))}

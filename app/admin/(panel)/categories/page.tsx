@@ -26,10 +26,10 @@ export default async function Categories() {
                 <div className="flex items-center gap-2">
                   <input type="hidden" name="slug" value={c.slug} />
                   <button className="rounded-xl bg-emerald px-4 py-2.5 text-sm font-semibold text-cream">Save</button>
-                  <ActionButton action={deleteCategory.bind(null, c.id)} confirmText={`Delete "${c.name}"? Its products stay but lose this category.`} className="rounded-xl p-2.5 text-muted hover:bg-red-50 hover:text-red-700"><Trash2 className="size-4" /></ActionButton>
+                  <ActionButton action={deleteCategory.bind(null, c.id)} label={`Delete ${c.name}`} confirmText={`Delete "${c.name}"? Its products stay but lose this category.`} className="rounded-xl p-2.5 text-muted hover:bg-red-50 hover:text-red-700"><Trash2 className="size-4" /></ActionButton>
                 </div>
               </form>
-              <p className="mt-2 text-xs text-muted">/collections/{c.slug} · {prods.filter((p) => p.c === c.id).length} products</p>
+              <p className="mt-2 text-xs text-muted">/collections/{c.slug} · {(() => { const n = prods.filter((p) => p.c === c.id).length; return `${n} product${n === 1 ? "" : "s"}`; })()}</p>
             </Card>
           ))}
         </div>

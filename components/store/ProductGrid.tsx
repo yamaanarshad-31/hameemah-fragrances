@@ -12,7 +12,7 @@ export function ProductGrid({ items }: { items: CardProduct[] }) {
     );
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-10 py-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
-      {items.map((p, i) => <ProductCard key={p.id} p={p} index={i} />)}
+      {items.map((p, i) => <ProductCard key={p.id} p={p} index={i} eager={i < 4} />)}
     </div>
   );
 }

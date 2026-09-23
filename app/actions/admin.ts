@@ -2,7 +2,7 @@
 import { z } from "zod";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { eq, like, sql } from "drizzle-orm";
+import { eq, inArray, like, sql } from "drizzle-orm";
 import { getDb, schema as s } from "@/lib/db";
 import { checkCredentials, createSession, destroySession, requireAdmin } from "@/lib/auth";
 import { slugify, STATUSES } from "@/lib/format";
@@ -75,8 +75,13 @@ export async function saveProduct(input: ProductInput) {
 export async function deleteProduct(id: number) {
   await requireAdmin();
   const db = await getDb();
+  const [p] = await db.select({ images: s.products.images }).from(s.products).where(eq(s.products.id, id));
   await db.delete(s.reviews).where(eq(s.reviews.productId, id));
   await db.delete(s.products).where(eq(s.products.id, id));
+  // drop uploaded photos nobody else uses (past orders keep showing the drawn bottle)
+  const others = (await db.select({ images: s.products.images }).from(s.products)).flatMap((x) => x.images);
+  const orphans = (p?.images ?? []).filter((u) => u.startsWith("/api/img/") && !others.includes(u)).map((u) => u.slice(9));
+  if (orphans.length) await db.delete(s.images).where(inArray(s.images.id, orphans));
   refresh();
 }
 
@@ -105,6 +110,7 @@ export async function setOrderStatus(id: number, status: string) {
         sold: Math.max(0, (p.sold ?? 0) - sign * it.qty),
       }).where(eq(s.products.id, p.id));
     }
+    if (o.coupon) await db.update(s.coupons).set({ uses: sql`max(0, ${s.coupons.uses} - ${sign})` }).where(eq(s.coupons.code, o.coupon));
   }
   await db.update(s.orders).set({ status }).where(eq(s.orders.id, id));
   refresh();
@@ -146,8 +152,13 @@ export async function saveCategory(form: FormData) {
     sort: Number(form.get("sort")) || 0,
   };
   const db = await getDb();
+  const all = await db.select().from(s.categories);
+  if (all.some((c) => c.id !== id && (c.slug === row.slug || c.name.toLowerCase() === name.toLowerCase()))) {
+    if (!id) return; // already exists — nothing to add
+    row.slug = `${row.slug}-${id}`;
+  }
   if (id) await db.update(s.categories).set(row).where(eq(s.categories.id, id));
-  else await db.insert(s.categories).values(row).onConflictDoNothing();
+  else await db.insert(s.categories).values(row);
   refresh();
 }
 

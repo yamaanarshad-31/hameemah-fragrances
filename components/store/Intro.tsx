@@ -5,16 +5,11 @@ const WORD = "FRAGRANCES";
 
 /**
  * First-visit curtain. Pure CSS so it plays before any JavaScript loads;
- * an inline script hides it for the rest of the browsing session.
+ * the inline script in app/layout.tsx <head> hides it for the rest of the session.
  */
 export function Intro() {
   return (
     <>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `try{if(sessionStorage.getItem('hf_intro')||matchMedia('(prefers-reduced-motion: reduce)').matches||/[?&]intro=skip/.test(location.search))document.documentElement.classList.add('intro-seen')}catch(e){}`,
-        }}
-      />
       <div id="intro" aria-hidden className="intro fixed inset-0 z-[100] overflow-hidden">
         <div className="intro-panel intro-top" />
         <div className="intro-panel intro-bot" />

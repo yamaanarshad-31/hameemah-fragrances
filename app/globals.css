@@ -7,10 +7,10 @@
   --color-emerald-2: #155238;
   --color-gold: #d4af37;
   --color-gold-2: #f3dc8f;
-  --color-gold-3: #a8841f;
+  --color-gold-3: #85650e;
   --color-cream: #f7f1e3;
   --color-cream-2: #efe5cf;
-  --color-muted: #6f7a72;
+  --color-muted: #56615a;
   --font-display: var(--font-cormorant), "Times New Roman", serif;
   --font-caps: var(--font-cinzel), "Times New Roman", serif;
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
@@ -117,3 +117,13 @@ input, textarea, select { font: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Hero entrance runs in CSS so the headline paints before JavaScript loads.
+   While the first-visit intro curtain plays, everything waits for it. */
+.hero-in, .hero-word { animation: heroUp 1s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--hero-wait, 2.5s) + var(--i, 0) * 1s); }
+.hero-word { animation-name: heroWord; animation-duration: 1.1s; }
+.hero-pop { animation: heroPop 1.4s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--hero-wait, 2.5s) + var(--i, 0) * 1s); }
+@keyframes heroPop { from { opacity: 0; transform: scale(.8); } }
+.intro-seen { --hero-wait: 0.1s; }
+@keyframes heroUp { from { opacity: 0; transform: translateY(20px); } }
+@keyframes heroWord { from { transform: translateY(110%) rotate(6deg); } }

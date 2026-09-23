@@ -26,7 +26,7 @@ export default async function Coupons() {
                   <td>{c.minTotal ? rs(c.minTotal) : "—"}</td>
                   <td className="tabular-nums">{c.uses}</td>
                   <td><ActionButton action={toggleCoupon.bind(null, c.id, !c.active)} className={`rounded-full px-3 py-1 text-xs font-semibold ${c.active ? "bg-emerald-100 text-emerald-900" : "bg-black/5 text-muted"}`}>{c.active ? "Active" : "Paused"}</ActionButton></td>
-                  <td className="pr-4 text-right"><ActionButton action={deleteCoupon.bind(null, c.id)} confirmText={`Delete ${c.code}?`} className="rounded-lg p-2 text-muted hover:bg-red-50 hover:text-red-700"><Trash2 className="size-4" /></ActionButton></td>
+                  <td className="pr-4 text-right"><ActionButton action={deleteCoupon.bind(null, c.id)} label={`Delete ${c.code}`} confirmText={`Delete ${c.code}?`} className="rounded-lg p-2 text-muted hover:bg-red-50 hover:text-red-700"><Trash2 className="size-4" /></ActionButton></td>
                 </tr>
               ))}
             </tbody>

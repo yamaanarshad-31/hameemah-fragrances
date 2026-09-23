@@ -5,7 +5,6 @@ import { AnimatePresence, motion, useMotionValue, useScroll, useSpring, useTrans
 import { ArrowRight, Sparkles, Truck, Wallet } from "lucide-react";
 import { GoldDust } from "./GoldDust";
 import { ProductImage } from "@/components/store/ProductImage";
-import { introDelay } from "@/components/store/IntroDone";
 import { rs } from "@/lib/format";
 
 export type HeroItem = { id: number; name: string; slug: string; tagline: string; price: number; image: string | null; color: string; shape: number };
@@ -14,11 +13,8 @@ const ease = [0.2, 0.8, 0.2, 1] as const;
 
 export function Hero({ items, title, subtitle, freeOver }: { items: HeroItem[]; title: string; subtitle: string; freeOver: number }) {
   const [i, setI] = useState(0);
-  const [delay, setDelay] = useState<number | null>(null);
   const cur = items[i % Math.max(1, items.length)];
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- read intro timing after mount
-  useEffect(() => setDelay(introDelay()), []);
   useEffect(() => {
     if (items.length < 2) return;
     const t = setInterval(() => setI((x) => (x + 1) % items.length), 4800);
@@ -37,7 +33,6 @@ export function Hero({ items, title, subtitle, freeOver }: { items: HeroItem[]; 
   const glowX = useSpring(useTransform(mx, [-1, 1], [-40, 40]), { stiffness: 60, damping: 20 });
 
   const words = title.split(" ");
-  const d = delay ?? 99; // hold everything until we know whether the intro is playing
 
   return (
     <section
@@ -61,43 +56,39 @@ export function Hero({ items, title, subtitle, freeOver }: { items: HeroItem[]; 
 
       <div className="relative mx-auto grid w-full max-w-7xl items-center gap-6 px-5 pb-16 lg:grid-cols-[1.1fr_1fr] lg:px-8">
         <motion.div style={{ y: yText, opacity: fade }} className="relative z-10 text-center lg:text-left">
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={delay === null ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: d }} className="eyebrow inline-flex items-center gap-2 rounded-full border border-gold/30 bg-white/5 px-4 py-2 text-gold-2 backdrop-blur">
-            <Sparkles className="size-3.5" /> Luxury perfumes · Made for Pakistan
-          </motion.p>
+          <p style={{ ["--i" as string]: 0 }} className="hero-in eyebrow inline-flex items-center gap-2 rounded-full border border-gold/30 bg-white/5 px-4 py-2 text-gold-2 backdrop-blur">
+            <Sparkles className="size-3.5" /> Luxury perfumes<span className="hidden sm:inline"> · Made for Pakistan</span>
+          </p>
           <h1 className="mt-6 font-display text-[3.2rem] font-medium leading-[0.95] sm:text-7xl lg:text-[5.6rem]" aria-label={title}>
             {words.map((w, k) => (
               <span key={k} className="inline-block overflow-hidden pb-2 align-bottom" aria-hidden>
-                <motion.span
-                  className={`inline-block ${k >= words.length - 2 ? "italic text-gold-shine" : ""}`}
-                  initial={{ y: "110%", rotate: 6 }}
-                  animate={delay === null ? {} : { y: 0, rotate: 0 }}
-                  transition={{ duration: 1.1, delay: d + 0.15 + k * 0.08, ease }}
-                >
+                <span className={`hero-word inline-block ${k >= words.length - 2 ? "italic text-gold-shine" : ""}`} style={{ ["--i" as string]: 0.15 + k * 0.08 }}>
                   {w}&nbsp;
-                </motion.span>
+                </span>
               </span>
             ))}
           </h1>
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={delay === null ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: d + 0.6 }} className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-cream/70 sm:text-lg lg:mx-0">
+          <p style={{ ["--i" as string]: 0.6 }} className="hero-in mx-auto mt-6 max-w-lg text-base leading-relaxed text-cream/70 sm:text-lg lg:mx-0">
             {subtitle}
-          </motion.p>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={delay === null ? {} : { opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: d + 0.75 }} className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
+          </p>
+          <div style={{ ["--i" as string]: 0.75 }} className="hero-in mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
             <Link href="/shop" className="btn-gold group inline-flex items-center gap-3 rounded-full px-8 py-4 text-sm font-bold uppercase tracking-[0.2em]">
               Shop the collection <ArrowRight className="size-4 transition group-hover:translate-x-1" />
             </Link>
             <Link href="#scent-finder" className="btn-ghost inline-flex items-center gap-2 rounded-full px-7 py-4 text-sm font-semibold uppercase tracking-[0.18em]">
               Find my scent
             </Link>
-          </motion.div>
-          <motion.ul initial={{ opacity: 0 }} animate={delay === null ? {} : { opacity: 1 }} transition={{ duration: 1, delay: d + 1 }} className="mt-10 flex flex-wrap justify-center gap-x-7 gap-y-3 text-xs uppercase tracking-[0.16em] text-cream/60 lg:justify-start">
+          </div>
+          <ul style={{ ["--i" as string]: 1 }} className="hero-in mt-10 flex flex-wrap justify-center gap-x-7 gap-y-3 text-xs uppercase tracking-[0.16em] text-cream/60 lg:justify-start">
             <li className="flex items-center gap-2"><Wallet className="size-4 text-gold" /> Cash on delivery</li>
             <li className="flex items-center gap-2"><Truck className="size-4 text-gold" /> Free delivery over {rs(freeOver)}</li>
             <li className="flex items-center gap-2"><Sparkles className="size-4 text-gold" /> Long-lasting</li>
-          </motion.ul>
+          </ul>
         </motion.div>
 
         {cur && (
-          <motion.div style={{ y: yBottle }} initial={{ opacity: 0, scale: 0.8 }} animate={delay === null ? {} : { opacity: 1, scale: 1 }} transition={{ duration: 1.4, delay: d + 0.2, ease }} className="relative mx-auto aspect-square w-full max-w-[34rem]">
+          <motion.div style={{ y: yBottle }} className="relative mx-auto aspect-square w-full max-w-[34rem]">
+           <div style={{ ["--i" as string]: 0.2 }} className="hero-pop absolute inset-0">
             {/* rotating monogram ring */}
             <svg viewBox="0 0 400 400" className="absolute inset-0 h-full w-full animate-spin-slow text-gold/50" aria-hidden>
               <defs><path id="ring" d="M200,200 m-170,0 a170,170 0 1,1 340,0 a170,170 0 1,1 -340,0" /></defs>
@@ -110,7 +101,7 @@ export function Hero({ items, title, subtitle, freeOver }: { items: HeroItem[]; 
             <div className="absolute inset-[14%] rounded-full border border-gold/25 bg-gradient-to-b from-white/[.06] to-transparent backdrop-blur-[2px]" />
 
             <motion.div style={{ rotateX: tiltX, rotateY: tiltY, transformPerspective: 1000 }} className="absolute inset-0">
-              <AnimatePresence mode="popLayout">
+              <AnimatePresence mode="popLayout" initial={false}>
                 <motion.div
                   key={cur.id}
                   initial={{ opacity: 0, y: 60, scale: 0.85, filter: "blur(10px)" }}
@@ -127,7 +118,7 @@ export function Hero({ items, title, subtitle, freeOver }: { items: HeroItem[]; 
             </motion.div>
 
             {/* floating product chip */}
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" initial={false}>
               <motion.div key={cur.id} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.6, delay: 0.3 }} className="absolute bottom-[4%] right-0 max-w-[15rem] rounded-2xl border border-gold/25 bg-ink/70 p-4 text-left shadow-2xl backdrop-blur-xl sm:right-[-4%]">
                 <p className="eyebrow !text-[0.6rem] text-gold">Now showing</p>
                 <p className="mt-1 font-display text-2xl leading-tight">{cur.name}</p>
@@ -143,6 +134,7 @@ export function Hero({ items, title, subtitle, freeOver }: { items: HeroItem[]; 
                 <button key={it.id} onClick={() => setI(k)} aria-label={`Show ${it.name}`} className={`h-8 w-1 rounded-full transition-all ${k === i % items.length ? "bg-gold" : "bg-cream/20 hover:bg-cream/50"}`} />
               ))}
             </div>
+           </div>
           </motion.div>
         )}
       </div>

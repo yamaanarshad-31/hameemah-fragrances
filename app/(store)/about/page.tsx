@@ -21,7 +21,7 @@ export default function About() {
       <PageHero eyebrow="Our story" title="Luxury in every drop" sub="A love for scent, turned into a house of fragrance." />
       <section className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 lg:grid-cols-2 lg:py-28">
         <Reveal className="relative mx-auto aspect-square w-full max-w-md rounded-[2rem] bg-gradient-to-b from-emerald to-ink p-10">
-          <Image src="/brand/logo-full.png" alt="Fragrances by Hameemah logo" fill sizes="400px" className="object-contain p-10" />
+          <Image src="/brand/logo-full.png" alt="Fragrances by Hameemah logo" fill priority sizes="400px" className="object-contain p-10" />
         </Reveal>
         <div>
           <SplitHeading text="Scent is the most personal thing you wear" className="font-display text-5xl leading-tight" />

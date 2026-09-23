@@ -40,14 +40,14 @@ export function ShopControls({ cats, active, count }: { cats: { name: string; sl
           {chip("/shop", "All", !active)}
           {cats.map((c) => chip(`/collections/${c.slug}`, c.name, active === c.slug))}
         </div>
-        <div className="flex items-center gap-2">
-          <label className="flex flex-1 items-center gap-2 rounded-full border border-ink/15 bg-white px-4 py-2.5 focus-within:border-emerald lg:w-64 lg:flex-none">
+        <div className="grid grid-cols-[minmax(0,1fr)_9rem] items-center gap-2 lg:flex">
+          <label className="flex min-w-0 items-center gap-2 rounded-full border border-ink/15 bg-white px-4 py-2.5 focus-within:border-emerald lg:w-64 lg:flex-none">
             <Search className="size-4 text-muted" />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search perfumes" aria-label="Search perfumes" className="w-full bg-transparent text-sm focus:outline-none" />
           </label>
-          <label className="flex items-center gap-2 rounded-full border border-ink/15 bg-white px-4 py-2.5">
+          <label className="flex min-w-0 items-center gap-2 rounded-full border border-ink/15 bg-white px-4 py-2.5 lg:w-52">
             <SlidersHorizontal className="size-4 text-muted" />
-            <select value={sp.get("sort") ?? ""} onChange={(e) => push({ sort: e.target.value })} aria-label="Sort by" className="bg-transparent text-sm focus:outline-none">
+            <select value={sp.get("sort") ?? ""} onChange={(e) => push({ sort: e.target.value })} aria-label="Sort by" className="w-full min-w-0 bg-transparent text-sm focus:outline-none">
               <option value="">Newest</option>
               <option value="popular">Bestselling</option>
               <option value="price-asc">Price: low to high</option>

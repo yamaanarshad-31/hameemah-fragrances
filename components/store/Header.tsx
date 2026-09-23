@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Heart, Menu, Search, ShoppingBag, X } from "lucide-react";
 import { useCart } from "./cart";
 import { SearchOverlay } from "./SearchOverlay";
+import { getLenis } from "./SmoothScroll";
 
 type Cat = { name: string; slug: string };
 
@@ -25,12 +26,19 @@ export function Header({ categories }: { categories: Cat[] }) {
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
   }, []);
+  useEffect(() => {
+    if (!menu) return;
+    const lenis = getLenis();
+    lenis?.stop();
+    document.body.style.overflow = "hidden";
+    return () => { lenis?.start(); document.body.style.overflow = ""; };
+  }, [menu]);
   // eslint-disable-next-line react-hooks/set-state-in-effect -- close menus on navigation
   useEffect(() => { setMenu(false); setSearch(false); }, [path]);
 
   const nav = [
     { href: "/shop", label: "Shop All" },
-    ...categories.slice(0, 4).map((c) => ({ href: `/collections/${c.slug}`, label: c.name })),
+    ...categories.slice(0, 5).map((c) => ({ href: `/collections/${c.slug}`, label: c.name })),
     { href: "/track-order", label: "Track Order" },
   ];
 
@@ -54,11 +62,11 @@ export function Header({ categories }: { categories: Cat[] }) {
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-7 lg:flex" aria-label="Main">
+          <nav className="hidden items-center gap-6 lg:flex xl:gap-7" aria-label="Main">
             {nav.map((n) => {
               const active = path === n.href || (n.href !== "/shop" && path.startsWith(n.href));
               return (
-                <Link key={n.href} href={n.href} className={`group relative py-2 text-[0.78rem] font-medium uppercase tracking-[0.18em] transition-colors ${active ? "text-gold" : "text-cream/85 hover:text-gold-2"}`}>
+                <Link key={n.href} href={n.href} className={`${n.href === "/track-order" ? "hidden xl:block " : ""}group relative py-2 text-[0.78rem] font-medium uppercase tracking-[0.18em] transition-colors ${active ? "text-gold" : "text-cream/85 hover:text-gold-2"}`}>
                   {n.label}
                   <span className={`absolute -bottom-0.5 left-0 h-px bg-gold transition-all duration-500 ${active ? "w-full" : "w-0 group-hover:w-full"}`} />
                 </Link>

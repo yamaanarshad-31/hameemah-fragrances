@@ -12,7 +12,7 @@ export type CardProduct = {
   color: string | null; shape: number | null; rating: number; reviewCount: number; isNew: boolean | null; bestseller: boolean | null; categoryName?: string | null;
 };
 
-export function ProductCard({ p, index = 0, dark = false }: { p: CardProduct; index?: number; dark?: boolean }) {
+export function ProductCard({ p, index = 0, dark = false, eager = false }: { p: CardProduct; index?: number; dark?: boolean; eager?: boolean }) {
   const { add, wishlist, toggleWish, notify } = useCart();
   const v = minPrice(p.variants);
   const off = discountPct(v.price, v.compareAt);
@@ -32,7 +32,7 @@ export function ProductCard({ p, index = 0, dark = false }: { p: CardProduct; in
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 50 }}
+      initial={eager ? false : { opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.8, delay: (index % 4) * 0.08, ease: [0.2, 0.8, 0.2, 1] }}

@@ -46,7 +46,7 @@ export function ProductView({ p, whatsapp }: { p: P; whatsapp: string }) {
 
   const line = () => ({ productId: p.id, slug: p.slug, name: p.name, size: v.size, price: v.price, qty, image: p.images[0] ?? null, color: p.color, shape: p.shape });
   const addToBag = () => { add(line()); setAdded(true); setTimeout(() => setAdded(false), 1800); };
-  const buyNow = () => { add(line()); router.push("/checkout"); };
+  const buyNow = () => { add(line(), false); router.push("/checkout"); };
   const share = async () => {
     const url = window.location.href;
     try {
@@ -67,7 +67,7 @@ export function ProductView({ p, whatsapp }: { p: P; whatsapp: string }) {
         >
           <div className="absolute inset-0" style={{ background: `radial-gradient(circle at 50% 40%, ${p.color}66, transparent 60%), linear-gradient(180deg,#155238,#06140d)` }} />
           <div className="absolute inset-[12%] animate-spin-slow rounded-full border border-dashed border-gold/20" />
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             <motion.div key={img} initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.04 }} transition={{ duration: 0.45 }} className="absolute inset-0">
               <div className="absolute inset-0 animate-float"><ProductImage src={gallery[img]} color={p.color} shape={p.shape} name={p.name} priority sizes="(max-width:1024px) 100vw, 50vw" /></div>
             </motion.div>
@@ -87,8 +87,8 @@ export function ProductView({ p, whatsapp }: { p: P; whatsapp: string }) {
 
       {/* details */}
       <div>
-        <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="eyebrow text-gold-3">{p.categoryName} · {p.concentration}</motion.p>
-        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mt-3 font-display text-5xl leading-none text-ink sm:text-6xl">{p.name}</motion.h1>
+        <p className="eyebrow text-gold-3">{p.categoryName} · {p.concentration}</p>
+        <h1 className="mt-3 font-display text-5xl leading-none text-ink sm:text-6xl">{p.name}</h1>
         <p className="mt-3 text-lg text-muted">{p.tagline}</p>
         {p.reviewCount > 0 && (
           <a href="#reviews" className="mt-3 inline-flex items-center gap-2 text-sm">
@@ -121,7 +121,7 @@ export function ProductView({ p, whatsapp }: { p: P; whatsapp: string }) {
           <div className="flex items-center rounded-full border border-ink/15 bg-white">
             <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="p-3.5" aria-label="Decrease quantity"><Minus className="size-4" /></button>
             <span className="w-8 text-center font-semibold" aria-live="polite">{qty}</span>
-            <button onClick={() => setQty((q) => Math.min(v.stock, q + 1))} className="p-3.5" aria-label="Increase quantity"><Plus className="size-4" /></button>
+            <button onClick={() => setQty((q) => Math.min(v.stock, 20, q + 1))} className="p-3.5" aria-label="Increase quantity"><Plus className="size-4" /></button>
           </div>
           <button onClick={addToBag} disabled={v.stock <= 0} className="relative flex min-w-48 flex-1 items-center justify-center gap-2 overflow-hidden rounded-full bg-emerald py-4 text-sm font-bold uppercase tracking-[0.2em] text-cream transition hover:bg-emerald-2 disabled:opacity-50">
             <AnimatePresence mode="wait" initial={false}>
