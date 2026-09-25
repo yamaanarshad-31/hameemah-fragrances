@@ -3,8 +3,10 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { RotateCcw, Sparkles } from "lucide-react";
 import { ProductCard, type CardProduct } from "@/components/store/ProductCard";
+import { useHomeCards } from "./ProductTabs";
 
-type P = CardProduct & { categorySlug: string | null; notes: string; longevity: number | null; sillage: number | null };
+/** Scoring data only; the card itself comes from the shared home-page products. */
+type P = { id: number; categorySlug: string | null; notes: string; longevity: number | null; sillage: number | null };
 
 const Q = [
   { q: "Who is it for?", a: [{ k: "men", l: "For him", e: "🤵" }, { k: "women", l: "For her", e: "👗" }, { k: "any", l: "Anyone", e: "✨" }] },
@@ -23,6 +25,7 @@ export function ScentFinder({ products }: { products: P[] }) {
   const [step, setStep] = useState(0);
   const [ans, setAns] = useState<string[]>([]);
   const done = step >= Q.length;
+  const cards = useHomeCards();
 
   const results = useMemo(() => {
     if (!done) return [];
@@ -41,15 +44,16 @@ export function ScentFinder({ products }: { products: P[] }) {
         return { p, s };
       })
       .sort((a, b) => b.s - a.s)
-      .slice(0, 3)
-      .map((x) => x.p);
-  }, [done, ans, products]);
+      .map((x) => cards.get(x.p.id))
+      .filter((c): c is CardProduct => !!c)
+      .slice(0, 3);
+  }, [done, ans, products, cards]);
 
   const pick = (k: string) => { setAns((a) => [...a.slice(0, step), k]); setStep((s) => s + 1); };
   const reset = () => { setAns([]); setStep(0); };
 
   return (
-    <section id="scent-finder" className="relative scroll-mt-24 overflow-hidden bg-forest py-24 text-cream lg:py-32">
+    <section id="scent-finder" className="relative scroll-mt-20 overflow-hidden bg-forest py-20 text-cream sm:py-24 lg:py-32">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(212,175,55,.15),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(21,82,56,.9),transparent_50%)]" />
       <div className="relative mx-auto max-w-5xl px-5 text-center">
         <p className="eyebrow flex items-center justify-center gap-2 text-gold"><Sparkles className="size-4" /> Scent finder</p>
@@ -69,23 +73,24 @@ export function ScentFinder({ products }: { products: P[] }) {
           {!done ? (
             <motion.div key={step} initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -60 }} transition={{ duration: 0.45 }} className="mt-10">
               <p className="font-display text-3xl">{Q[step].q}</p>
-              <div className="mx-auto mt-8 flex max-w-3xl flex-wrap justify-center gap-4">
+              <div className="mx-auto mt-6 flex max-w-3xl flex-wrap justify-center gap-3 sm:mt-8 sm:gap-4">
                 {Q[step].a.map((a) => (
-                  <motion.button key={a.k} whileHover={{ y: -6 }} whileTap={{ scale: 0.96 }} onClick={() => pick(a.k)} className="w-[46%] rounded-3xl border border-gold/25 bg-white/5 px-6 py-7 backdrop-blur transition-colors hover:border-gold hover:bg-gold/10 sm:w-44">
-                    <span className="text-4xl">{a.e}</span>
-                    <span className="mt-3 block text-sm font-semibold uppercase tracking-[0.14em]">{a.l}</span>
+                  <motion.button key={a.k} whileHover={{ y: -6 }} whileTap={{ scale: 0.96 }} onClick={() => pick(a.k)} className="w-[calc(50%-0.375rem)] rounded-3xl border border-gold/25 bg-white/5 px-3 py-5 transition-colors hover:border-gold hover:bg-gold/10 active:border-gold active:bg-gold/10 sm:w-44 sm:px-6 sm:py-7">
+                    <span className="text-3xl sm:text-4xl">{a.e}</span>
+                    <span className="mt-2.5 block text-xs font-semibold uppercase tracking-[0.12em] sm:mt-3 sm:text-sm sm:tracking-[0.14em]">{a.l}</span>
                   </motion.button>
                 ))}
               </div>
-              {step > 0 && <button onClick={() => setStep((s) => s - 1)} className="mt-8 text-sm text-cream/50 underline-offset-4 hover:underline">← Back</button>}
+              {step > 0 && <button onClick={() => setStep((s) => s - 1)} className="mt-6 min-h-11 px-4 text-sm text-cream/60 underline-offset-4 hover:underline sm:mt-8">← Back</button>}
             </motion.div>
           ) : (
             <motion.div key="res" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="mt-12">
               <p className="font-display text-3xl">Your perfect matches</p>
-              <div className="mt-10 grid gap-8 text-left sm:grid-cols-3">
-                {results.map((p, i) => <ProductCard key={p.id} p={p} index={i} dark />)}
+              {/* phones: a swipeable row; larger screens: three columns */}
+              <div className="scroll-row -mx-5 mt-8 flex scroll-px-5 gap-4 px-5 pb-2 text-left sm:mx-0 sm:mt-10 sm:grid sm:grid-cols-3 sm:gap-8 sm:overflow-visible sm:px-0 sm:pb-0">
+                {results.map((p, i) => <div key={p.id} className="w-[68%] shrink-0 sm:w-auto"><ProductCard p={p} index={i} dark eager /></div>)}
               </div>
-              <button onClick={reset} className="mt-10 inline-flex items-center gap-2 text-sm text-gold-2 hover:text-gold"><RotateCcw className="size-4" /> Start again</button>
+              <button onClick={reset} className="mt-8 inline-flex min-h-11 items-center gap-2 px-4 text-sm text-gold-2 hover:text-gold sm:mt-10"><RotateCcw className="size-4" /> Start again</button>
             </motion.div>
           )}
         </AnimatePresence>

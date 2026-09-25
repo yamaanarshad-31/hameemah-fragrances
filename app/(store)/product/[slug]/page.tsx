@@ -31,11 +31,11 @@ export async function generateMetadata({ params }: PageProps<"/product/[slug]">)
 }
 
 function Pyramid({ top, heart, base }: { top: string; heart: string; base: string }) {
-  const rows = [["Top", top, "The first impression", "w-[60%]"], ["Heart", heart, "The soul of the scent", "w-[80%]"], ["Base", base, "What lingers all day", "w-full"]];
+  const rows = [["Top", top, "The first impression", "w-[74%] sm:w-[60%]"], ["Heart", heart, "The soul of the scent", "w-[87%] sm:w-[80%]"], ["Base", base, "What lingers all day", "w-full"]];
   return (
     <div className="flex flex-col items-center gap-3">
       {rows.map(([t, n, d, w], i) => (
-        <Reveal key={t} delay={i * 0.15} className={`${w} rounded-3xl border border-gold/25 bg-gradient-to-b from-emerald to-forest px-6 py-6 text-center text-cream`}>
+        <Reveal key={t} delay={i * 0.15} className={`${w} rounded-3xl border border-gold/25 bg-gradient-to-b from-emerald to-forest px-4 py-5 text-center text-cream sm:px-6 sm:py-6`}>
           <p className="eyebrow text-gold">{t} notes</p>
           <p className="mt-2 font-display text-2xl sm:text-3xl">{n}</p>
           <p className="mt-1 text-xs text-cream/50">{d}</p>
@@ -146,7 +146,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={ld([jsonLd, crumbs])} />
       <div className="mx-auto max-w-7xl px-5 pt-8 lg:px-8">
-        <nav aria-label="Breadcrumb" className="mb-8 text-xs uppercase tracking-[0.16em] text-muted">
+        <nav aria-label="Breadcrumb" className="mb-5 truncate text-xs uppercase leading-8 tracking-[0.16em] text-muted sm:mb-8">
           <Link href="/" className="hover:text-emerald">Home</Link>
           {p.categorySlug && <> / <Link href={`/collections/${p.categorySlug}`} className="hover:text-emerald">{p.categoryName}</Link></>}
           {" / "}<span className="text-ink">{p.name}</span>
@@ -155,14 +155,14 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
       </div>
 
       {p.topNotes && (
-        <section className="mx-auto mt-24 max-w-3xl px-5">
+        <section className="mx-auto mt-16 max-w-3xl px-5 sm:mt-24">
           <p className="eyebrow text-center text-gold-3">Fragrance notes</p>
-          <h2 className="mb-10 mt-3 text-center font-display text-5xl">The scent pyramid</h2>
+          <h2 className="mb-8 mt-3 text-center font-display text-[2.6rem] leading-tight sm:mb-10 sm:text-5xl">The scent pyramid</h2>
           <Pyramid top={p.topNotes ?? ""} heart={p.heartNotes ?? ""} base={p.baseNotes ?? ""} />
         </section>
       )}
 
-      <section id="reviews" className="mx-auto mt-24 grid max-w-7xl scroll-mt-28 gap-10 px-5 lg:grid-cols-[1fr_1.2fr] lg:px-8">
+      <section id="reviews" className="mx-auto mt-16 grid max-w-7xl scroll-mt-28 gap-10 px-5 sm:mt-24 lg:grid-cols-[1fr_1.2fr] lg:px-8">
         <div>
           <h2 className="font-display text-5xl">Reviews</h2>
           {p.reviewCount > 0 ? (
@@ -180,8 +180,8 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
         </div>
         <ul className="space-y-4">
           {reviews.map((v) => (
-            <li key={v.id} className="rounded-3xl bg-white p-6 shadow-[0_15px_40px_-30px_rgba(6,20,13,.5)]">
-              <div className="flex items-center justify-between">
+            <li key={v.id} className="rounded-3xl bg-white p-5 shadow-[0_15px_40px_-30px_rgba(6,20,13,.5)] sm:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                 <p className="font-semibold">{v.name}{v.city ? <span className="font-normal text-muted"> · {v.city}</span> : null}</p>
                 <div className="flex text-gold">{[1, 2, 3, 4, 5].map((k) => <Star key={k} className={`size-4 ${k <= v.rating ? "fill-gold" : "opacity-25"}`} />)}</div>
               </div>
@@ -193,9 +193,9 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
       </section>
 
       {more.length > 0 && (
-        <section className="mx-auto max-w-7xl px-5 py-24 lg:px-8">
-          <h2 className="font-display text-5xl">You may also love</h2>
-          <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4 lg:gap-x-6">
+        <section className="mx-auto max-w-7xl px-5 py-20 sm:py-24 lg:px-8">
+          <h2 className="font-display text-[2.6rem] leading-tight sm:text-5xl">You may also love</h2>
+          <div className="mt-8 grid grid-cols-2 gap-x-3 gap-y-10 sm:mt-10 sm:gap-x-4 md:grid-cols-4 lg:gap-x-6">
             {more.map((x, i) => <ProductCard key={x.id} p={toCard(x)} index={i} />)}
           </div>
         </section>

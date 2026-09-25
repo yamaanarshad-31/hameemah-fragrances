@@ -17,6 +17,7 @@
   --animate-shimmer: shimmer 3.5s linear infinite;
   --animate-marquee: marquee var(--marquee-dur, 40s) linear infinite;
   --animate-float: float 6s ease-in-out infinite;
+  --animate-breathe: breathe 9s ease-in-out infinite;
   --animate-spin-slow: spin 24s linear infinite;
 
   @keyframes shimmer {
@@ -24,6 +25,10 @@
   }
   @keyframes marquee {
     to { transform: translateX(-50%); }
+  }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1.03); }
+    50% { transform: scale(1.08); }
   }
   @keyframes float {
     0%, 100% { transform: translateY(0) rotate(-1deg); }
@@ -60,6 +65,10 @@ body {
   color: transparent;
   animation: var(--animate-shimmer);
 }
+/* The shine repaints the text every frame; on phones keep the gold gradient but hold it still. */
+@media (hover: none), (pointer: coarse) {
+  .text-gold-shine { animation: none; background-position: 30% center; }
+}
 
 .bg-gold-grad { background: linear-gradient(135deg, #f3dc8f 0%, #d4af37 45%, #a8841f 100%); }
 .border-gold-grad { border-image: linear-gradient(90deg, transparent, #d4af37, transparent) 1; }
@@ -89,15 +98,21 @@ body {
   transition: transform .8s ease;
   z-index: -1;
 }
-.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -10px rgb(212 175 55 / .8); }
-.btn-gold:hover::after { transform: translateX(120%); }
+@media (hover: hover) {
+  .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -10px rgb(212 175 55 / .8); }
+  .btn-gold:hover::after { transform: translateX(120%); }
+}
+.btn-gold:active { transform: scale(.98); }
 
 .btn-ghost {
   border: 1px solid rgb(212 175 55 / .55);
   color: var(--color-gold-2);
   transition: background .3s, color .3s, border-color .3s;
 }
-.btn-ghost:hover { background: rgb(212 175 55 / .12); border-color: var(--color-gold); }
+@media (hover: hover) {
+  .btn-ghost:hover { background: rgb(212 175 55 / .12); border-color: var(--color-gold); }
+}
+.btn-ghost:active { background: rgb(212 175 55 / .12); }
 
 .grain::before {
   content: "";
@@ -107,12 +122,41 @@ body {
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+/* The blended film grain costs a full-screen composite on every frame; phones don't need it. */
+@media (pointer: coarse) {
+  .grain::before { display: none; }
+}
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 
 input, textarea, select { font: inherit; }
-:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
+/* Phones zoom into any field under 16px when it gets focus; keep every field at 16px there. */
+@media (max-width: 1023px) {
+  input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]), textarea, select { font-size: max(16px, 1em); }
+}
+/* In the base layer so a utility such as focus:outline-none can still switch it off. */
+@layer base {
+  :focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
+}
+
+/* Phones: native momentum scrolling everywhere, sideways rows that never trap the page. */
+.scroll-row {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  touch-action: pan-x pan-y;
+  scrollbar-width: none;
+}
+.scroll-row::-webkit-scrollbar { display: none; }
+.scroll-row > * { scroll-snap-align: start; }
+
+/* Space for the iPhone home indicator under fixed bars. */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+
+/* Skip rendering below-the-fold sections until they get close (pauses their animations too). */
+.cv-auto { content-visibility: auto; contain-intrinsic-size: auto 900px; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -127,3 +171,31 @@ input, textarea, select { font: inherit; }
 .intro-seen { --hero-wait: 0.1s; }
 @keyframes heroUp { from { opacity: 0; transform: translateY(20px); } }
 @keyframes heroWord { from { transform: translateY(110%) rotate(6deg); } }
+
+/* The WhatsApp bubble steps up above the product page's sticky "Add to bag" bar. */
+@media (max-width: 1023px) {
+  body:has([data-pdp-bar]) .wa-btn { bottom: calc(5.75rem + env(safe-area-inset-bottom)); }
+}
+
+/* Star rating (see components/store/Stars.tsx): one element, the stars are a repeating mask. */
+.stars {
+  display: inline-block;
+  flex-shrink: 0;
+  height: var(--s);
+  width: calc(var(--s) * 5 + 8px);
+  background: linear-gradient(90deg, var(--color-gold) var(--pct), rgb(212 175 55 / .28) var(--pct));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 24'%3E%3Cpath d='M11.5 2.3a.5.5 0 0 1 1 0l2.3 4.7a2.1 2.1 0 0 0 1.6 1.2l5.2.7a.5.5 0 0 1 .3.9l-3.8 3.7a2.1 2.1 0 0 0-.6 1.9l.9 5.1a.5.5 0 0 1-.8.6l-4.6-2.4a2.1 2.1 0 0 0-2 0L6.4 21a.5.5 0 0 1-.8-.6l.9-5.1a2.1 2.1 0 0 0-.6-1.9L2.2 9.8a.5.5 0 0 1 .3-.9l5.1-.7a2.1 2.1 0 0 0 1.6-1.2z'/%3E%3C/svg%3E") 0 0 / calc(var(--s) + 2px) var(--s) repeat-x;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 24'%3E%3Cpath d='M11.5 2.3a.5.5 0 0 1 1 0l2.3 4.7a2.1 2.1 0 0 0 1.6 1.2l5.2.7a.5.5 0 0 1 .3.9l-3.8 3.7a2.1 2.1 0 0 0-.6 1.9l.9 5.1a.5.5 0 0 1-.8.6l-4.6-2.4a2.1 2.1 0 0 0-2 0L6.4 21a.5.5 0 0 1-.8-.6l.9-5.1a2.1 2.1 0 0 0-.6-1.9L2.2 9.8a.5.5 0 0 1 .3-.9l5.1-.7a2.1 2.1 0 0 0 1.6-1.2z'/%3E%3C/svg%3E") 0 0 / calc(var(--s) + 2px) var(--s) repeat-x;
+}
+
+/* Hero light rays and scroll cue: compositor-only keyframes. */
+.hero-ray { animation: heroRay 7s ease-in-out infinite; will-change: transform, opacity; }
+@keyframes heroRay {
+  0%, 100% { transform: rotate(var(--r0)); opacity: .3; }
+  50% { transform: rotate(var(--r1)); opacity: .7; }
+}
+.hero-scroll-dot { animation: heroScrollDot 1.6s ease-in-out infinite; }
+@keyframes heroScrollDot {
+  from { transform: translateY(-16px); }
+  to { transform: translateY(40px); }
+}

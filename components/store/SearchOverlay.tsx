@@ -40,13 +40,13 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
   return (
     <AnimatePresence>
       {open && (
-        <motion.div className="fixed inset-0 z-50 overflow-y-auto bg-ink/95 backdrop-blur-xl" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} data-lenis-prevent>
-          <div className="mx-auto max-w-4xl px-5 pt-8 sm:pt-16">
-            <div className="flex justify-end">
-              <button onClick={onClose} className="p-2 text-gold-2" aria-label="Close search"><X className="size-7" /></button>
+        <motion.div role="dialog" aria-modal="true" aria-label="Search" className="fixed inset-0 z-50 h-dvh overflow-y-auto overscroll-contain bg-ink lg:bg-ink/95 lg:backdrop-blur-xl" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} data-lenis-prevent>
+          <div className="mx-auto max-w-4xl px-5 pt-[calc(1rem+env(safe-area-inset-top))] sm:pt-16">
+            <div className="-mr-2 flex justify-end">
+              <button onClick={onClose} className="flex size-11 items-center justify-center rounded-full text-gold-2" aria-label="Close search"><X className="size-7" /></button>
             </div>
-            <motion.label initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="mt-4 flex items-center gap-4 border-b border-gold/40 pb-4">
-              <Search className="size-7 shrink-0 text-gold" />
+            <motion.label initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="mt-2 flex items-center gap-3 border-b border-gold/40 pb-3 focus-within:border-gold sm:mt-4 sm:gap-4 sm:pb-4">
+              <Search className="size-6 shrink-0 text-gold sm:size-7" />
               <input
                 ref={input}
                 value={q}
@@ -59,19 +59,19 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
                 }}
                 enterKeyHint="search"
                 placeholder="Search rose, amber, fresh…"
-                className="w-full bg-transparent font-display text-3xl text-cream placeholder:text-cream/30 focus:outline-none sm:text-5xl"
+                className="w-full min-w-0 bg-transparent font-display text-3xl text-cream placeholder:text-cream/30 focus:outline-none sm:text-5xl"
                 aria-label="Search perfumes"
               />
             </motion.label>
             <p className="mt-4 text-sm text-cream/50">{loading ? "Searching…" : q ? `${hits.length} result${hits.length === 1 ? "" : "s"}` : "Popular right now"}</p>
-            <div className="mt-6 grid grid-cols-2 gap-4 pb-16 sm:grid-cols-4">
+            <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-6 pb-[calc(4rem+env(safe-area-inset-bottom))] sm:grid-cols-4">
               {hits.map((h, i) => (
                 <motion.div key={h.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
                   <Link href={`/product/${h.slug}`} onClick={onClose} className="group block">
                     <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-gradient-to-b from-emerald to-forest">
                       <ProductImage src={h.image} color={h.color} shape={h.shape} name={h.name} className="transition duration-700 group-hover:scale-105" />
                     </div>
-                    <p className="mt-2 font-display text-lg text-cream group-hover:text-gold">{h.name}</p>
+                    <p className="mt-2 font-display text-lg leading-tight text-cream group-hover:text-gold">{h.name}</p>
                     <p className="text-sm text-gold-2">from {rs(h.price)}</p>
                   </Link>
                 </motion.div>

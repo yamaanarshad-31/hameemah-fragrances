@@ -28,9 +28,9 @@ export default async function Reviews() {
               </div>
               <div className="flex gap-2">
                 {r.approved
-                  ? <ActionButton action={setReviewApproved.bind(null, r.id, false)} className="flex items-center gap-1.5 rounded-xl border border-black/10 px-3 py-2 text-sm"><EyeOff className="size-4" /> Hide</ActionButton>
-                  : <ActionButton action={setReviewApproved.bind(null, r.id, true)} className="flex items-center gap-1.5 rounded-xl bg-emerald px-3 py-2 text-sm font-semibold text-cream"><Check className="size-4" /> Approve</ActionButton>}
-                <ActionButton action={deleteReview.bind(null, r.id)} label={`Delete review by ${r.name}`} confirmText="Delete this review?" className="rounded-xl p-2 text-muted hover:bg-red-50 hover:text-red-700"><Trash2 className="size-4" /></ActionButton>
+                  ? <ActionButton action={setReviewApproved.bind(null, r.id, false)} className="flex min-h-11 items-center gap-1.5 rounded-xl border border-black/10 px-3 py-2 text-sm"><EyeOff className="size-4" /> Hide</ActionButton>
+                  : <ActionButton action={setReviewApproved.bind(null, r.id, true)} className="flex min-h-11 items-center gap-1.5 rounded-xl bg-emerald px-3 py-2 text-sm font-semibold text-cream"><Check className="size-4" /> Approve</ActionButton>}
+                <ActionButton action={deleteReview.bind(null, r.id)} label={`Delete review by ${r.name}`} confirmText="Delete this review?" className="flex size-11 items-center justify-center rounded-xl text-muted hover:bg-red-50 hover:text-red-700"><Trash2 className="size-4" /></ActionButton>
               </div>
             </div>
           </Card>

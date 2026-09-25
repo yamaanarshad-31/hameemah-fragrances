@@ -67,8 +67,8 @@ export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) 
   };
 
   return (
-    <div className="grid gap-6 pb-28 xl:grid-cols-[1fr_340px]">
-      <div className="space-y-6">
+    <div className="grid grid-cols-1 gap-6 pb-28 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0 space-y-6">
         <Card>
           <p className="mb-4 font-semibold">Basics</p>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -96,25 +96,26 @@ export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) 
           <div
             onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
             onDrop={(e) => { e.preventDefault(); setDrag(false); upload(e.dataTransfer.files); }}
-            className={`grid grid-cols-3 gap-3 rounded-2xl border-2 border-dashed p-3 transition sm:grid-cols-4 ${drag ? "border-emerald bg-emerald/5" : "border-black/10"}`}
+            className={`grid grid-cols-2 gap-3 rounded-2xl border-2 border-dashed p-3 transition sm:grid-cols-4 ${drag ? "border-emerald bg-emerald/5" : "border-black/10"}`}
           >
             {p.images.map((src, i) => (
               <div key={src} className="group relative aspect-square overflow-hidden rounded-xl bg-black/5">
                 <Image src={src} alt="" fill sizes="160px" className="object-cover" />
                 {i === 0 && <span className="absolute left-1.5 top-1.5 rounded-full bg-gold px-2 py-0.5 text-[0.6rem] font-bold uppercase">Main</span>}
-                <div className="absolute inset-x-0 bottom-0 flex justify-between bg-gradient-to-t from-black/70 p-1.5 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100">
+                {/* always visible on touch screens (no hover there); on desktop they appear on hover */}
+                <div className="absolute inset-x-0 bottom-0 flex justify-between bg-gradient-to-t from-black/70 p-1.5 opacity-100 transition [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-within:opacity-100">
                   <span className="flex gap-1">
-                    <button type="button" onClick={() => move(i, -1)} className="rounded bg-white/90 p-1" aria-label="Move left"><ArrowLeft className="size-3.5" /></button>
-                    <button type="button" onClick={() => move(i, 1)} className="rounded bg-white/90 p-1" aria-label="Move right"><ArrowRight className="size-3.5" /></button>
+                    <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="flex size-9 items-center justify-center rounded-lg bg-white/90 disabled:opacity-40 sm:size-7" aria-label="Move left"><ArrowLeft className="size-4 sm:size-3.5" /></button>
+                    <button type="button" onClick={() => move(i, 1)} disabled={i === p.images.length - 1} className="flex size-9 items-center justify-center rounded-lg bg-white/90 disabled:opacity-40 sm:size-7" aria-label="Move right"><ArrowRight className="size-4 sm:size-3.5" /></button>
                   </span>
-                  <button type="button" onClick={() => set("images", p.images.filter((_, k) => k !== i))} className="rounded bg-white/90 p-1 text-red-700" aria-label="Remove photo"><X className="size-3.5" /></button>
+                  <button type="button" onClick={() => set("images", p.images.filter((_, k) => k !== i))} className="flex size-9 items-center justify-center rounded-lg bg-white/90 text-red-700 sm:size-7" aria-label="Remove photo"><X className="size-4 sm:size-3.5" /></button>
                 </div>
               </div>
             ))}
             {p.images.length < 8 && (
               <button type="button" onClick={() => fileRef.current?.click()} className="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-black/[.03] text-sm text-muted transition hover:bg-emerald/5 hover:text-emerald">
                 {uploading ? <Loader2 className="size-6 animate-spin" /> : <ImagePlus className="size-6" />}
-                <span className="text-xs">{uploading ? "Uploading…" : "Add / drop"}</span>
+                <span className="text-xs">{uploading ? "Uploading…" : <><span className="[@media(hover:none)]:hidden">Add / drop</span><span className="[@media(hover:hover)]:hidden">Add photos</span></>}</span>
               </button>
             )}
           </div>
@@ -127,15 +128,16 @@ export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) 
           <div className="space-y-3">
             <div className="hidden grid-cols-[1fr_1fr_1fr_1fr_36px] gap-2 text-xs font-semibold uppercase tracking-wider text-ink/50 sm:grid"><span>Size</span><span>Price (Rs.)</span><span>Was price</span><span>Stock</span><span /></div>
             {p.variants.map((v, i) => (
-              <div key={i} className="grid grid-cols-2 gap-2 rounded-xl bg-black/[.02] p-2 sm:grid-cols-[1fr_1fr_1fr_1fr_36px] sm:bg-transparent sm:p-0">
-                <input aria-label="Size" className={inputCls} value={v.size} onChange={(e) => setV(i, { size: e.target.value })} placeholder="50ml" />
-                <input aria-label="Price" type="number" min={0} className={inputCls} value={v.price} onChange={(e) => setV(i, { price: Number(e.target.value) })} />
-                <input aria-label="Was price" type="number" min={0} className={inputCls} value={v.compareAt ?? ""} onChange={(e) => setV(i, { compareAt: e.target.value ? Number(e.target.value) : null })} placeholder="—" />
-                <input aria-label="Stock" type="number" min={0} className={inputCls} value={v.stock} onChange={(e) => setV(i, { stock: Number(e.target.value) })} />
-                <button type="button" disabled={p.variants.length === 1} onClick={() => set("variants", p.variants.filter((_, k) => k !== i))} className="flex items-center justify-center rounded-xl text-muted hover:bg-red-50 hover:text-red-700 disabled:opacity-30" aria-label="Remove size"><Trash2 className="size-4" /></button>
+              <div key={i} className="grid grid-cols-2 gap-2 rounded-xl bg-black/[.03] p-3 sm:grid-cols-[1fr_1fr_1fr_1fr_40px] sm:bg-transparent sm:p-0">
+                {/* phones stack the fields two by two, so each one carries its own caption */}
+                <label className="min-w-0"><span className={`${labelCls} mb-1 sm:hidden`}>Size</span><input aria-label="Size" className={inputCls} value={v.size} onChange={(e) => setV(i, { size: e.target.value })} placeholder="50ml" /></label>
+                <label className="min-w-0"><span className={`${labelCls} mb-1 sm:hidden`}>Price (Rs.)</span><input aria-label="Price" type="number" inputMode="numeric" min={0} className={inputCls} value={v.price} onChange={(e) => setV(i, { price: Number(e.target.value) })} /></label>
+                <label className="min-w-0"><span className={`${labelCls} mb-1 sm:hidden`}>Was price</span><input aria-label="Was price" type="number" inputMode="numeric" min={0} className={inputCls} value={v.compareAt ?? ""} onChange={(e) => setV(i, { compareAt: e.target.value ? Number(e.target.value) : null })} placeholder="—" /></label>
+                <label className="min-w-0"><span className={`${labelCls} mb-1 sm:hidden`}>Stock</span><input aria-label="Stock" type="number" inputMode="numeric" min={0} className={inputCls} value={v.stock} onChange={(e) => setV(i, { stock: Number(e.target.value) })} /></label>
+                <button type="button" disabled={p.variants.length === 1} onClick={() => set("variants", p.variants.filter((_, k) => k !== i))} className="col-span-2 flex min-h-11 items-center justify-center gap-2 rounded-xl text-sm font-medium text-muted hover:bg-red-50 hover:text-red-700 disabled:opacity-30 sm:col-span-1" aria-label="Remove size"><Trash2 className="size-4" /><span className="sm:hidden">Remove this size</span></button>
               </div>
             ))}
-            <button type="button" onClick={() => set("variants", [...p.variants, { size: ["50ml", "100ml"].find((z) => !p.variants.some((v) => v.size === z)) ?? "", price: 0, compareAt: null, stock: 0 }])} className="flex items-center gap-1.5 text-sm font-semibold text-emerald"><Plus className="size-4" /> Add size</button>
+            <button type="button" onClick={() => set("variants", [...p.variants, { size: ["50ml", "100ml"].find((z) => !p.variants.some((v) => v.size === z)) ?? "", price: 0, compareAt: null, stock: 0 }])} className="flex min-h-11 items-center gap-1.5 text-sm font-semibold text-emerald"><Plus className="size-4" /> Add size</button>
           </div>
         </Card>
 
@@ -155,11 +157,11 @@ export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) 
         </Card>
       </div>
 
-      <div className="space-y-6">
+      <div className="min-w-0 space-y-6">
         <Card>
           <p className="mb-4 font-semibold">Visibility</p>
           {([["active", "Visible on store"], ["featured", "Featured on home page"], ["bestseller", "Bestseller"], ["isNew", "New arrival"]] as const).map(([k, l]) => (
-            <div key={k} className="flex items-center justify-between py-2"><span className="text-sm">{l}</span><Toggle on={!!p[k]} label={l} onChange={(v) => set(k, v)} /></div>
+            <div key={k} className="flex min-h-11 items-center justify-between gap-3 py-1"><span className="text-sm">{l}</span><Toggle on={!!p[k]} label={l} onChange={(v) => set(k, v)} /></div>
           ))}
         </Card>
         <Card>
@@ -169,8 +171,8 @@ export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) 
             <Bottle color={p.color} shape={p.shape} name={p.name || "Your perfume"} className="h-44 w-auto" />
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
-            {SWATCHES.map((c) => <button type="button" key={c} onClick={() => set("color", c)} aria-label={`Colour ${c}`} className={`size-7 rounded-full ring-offset-2 ${p.color === c ? "ring-2 ring-emerald" : ""}`} style={{ background: c }} />)}
-            <input type="color" aria-label="Custom colour" value={p.color ?? "#b8860b"} onChange={(e) => set("color", e.target.value)} className="size-7 cursor-pointer rounded-full" />
+            {SWATCHES.map((c) => <button type="button" key={c} onClick={() => set("color", c)} aria-label={`Colour ${c}`} className={`size-9 rounded-full ring-offset-2 sm:size-7 ${p.color === c ? "ring-2 ring-emerald" : ""}`} style={{ background: c }} />)}
+            <input type="color" aria-label="Custom colour" value={p.color ?? "#b8860b"} onChange={(e) => set("color", e.target.value)} className="size-9 cursor-pointer rounded-full sm:size-7" />
           </div>
           <div className="mt-4 grid grid-cols-4 gap-2">
             {[0, 1, 2, 3].map((k) => (
@@ -182,18 +184,18 @@ export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) 
         </Card>
         {p.id && (
           <Card>
-            <a href={`/product/${p.slug}`} target="_blank" className="flex items-center gap-2 text-sm font-semibold text-emerald"><ExternalLink className="size-4" /> View on store</a>
-            <button type="button" onClick={remove} className="mt-3 flex items-center gap-2 text-sm font-semibold text-red-700"><Trash2 className="size-4" /> Delete product</button>
+            <a href={`/product/${p.slug}`} target="_blank" className="flex min-h-11 items-center gap-2 text-sm font-semibold text-emerald"><ExternalLink className="size-4" /> View on store</a>
+            <button type="button" onClick={remove} className="mt-1 flex min-h-11 items-center gap-2 text-sm font-semibold text-red-700"><Trash2 className="size-4" /> Delete product</button>
           </Card>
         )}
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-black/5 bg-white/90 backdrop-blur lg:left-64">
-        <div className="mx-auto flex max-w-7xl items-center justify-end gap-4 px-4 py-3 sm:px-6 lg:px-10">
-          {err && <p className="mr-auto text-sm font-medium text-red-700" role="alert">{err}</p>}
-          {saved && !err && <p className="mr-auto text-sm font-medium text-emerald">✓ Saved — live on the store</p>}
-          <button type="button" onClick={() => router.push("/admin/products")} className="rounded-xl px-4 py-2.5 text-sm font-semibold text-muted hover:text-ink">Cancel</button>
-          <button type="button" onClick={save} disabled={pending || uploading} className="btn-gold rounded-xl px-7 py-2.5 text-sm font-bold disabled:opacity-60">{pending ? "Saving…" : p.id ? "Save changes" : "Create product"}</button>
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-black/5 bg-white/95 pb-[env(safe-area-inset-bottom)] lg:left-64 lg:bg-white/90 lg:backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-end gap-2 px-4 py-3 sm:gap-4 sm:px-6 lg:px-10">
+          {err && <p className="mr-auto min-w-0 text-sm font-medium text-red-700" role="alert">{err}</p>}
+          {saved && !err && <p className="mr-auto min-w-0 text-sm font-medium text-emerald">✓ Saved<span className="hidden sm:inline"> — live on the store</span></p>}
+          <button type="button" onClick={() => router.push("/admin/products")} className="min-h-11 shrink-0 rounded-xl px-4 py-2.5 text-sm font-semibold text-muted hover:text-ink">Cancel</button>
+          <button type="button" onClick={save} disabled={pending || uploading} className="btn-gold min-h-11 shrink-0 rounded-xl px-6 py-2.5 text-sm font-bold disabled:opacity-60 sm:px-7">{pending ? "Saving…" : p.id ? "Save changes" : "Create product"}</button>
         </div>
       </div>
     </div>

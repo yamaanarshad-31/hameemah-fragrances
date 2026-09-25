@@ -33,26 +33,27 @@ export function ShopControls({ cats, active, count }: { cats: { name: string; sl
   const sort = sp.get("sort");
   if (sort) keep.set("sort", sort);
   const chip = (path: string, label: string, on: boolean) => (
-    <Link key={path} href={`${path}${keep.size ? `?${keep}` : ""}`} scroll={false} className={`whitespace-nowrap rounded-full border px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] transition ${on ? "border-emerald bg-emerald text-cream" : "border-ink/15 text-ink/70 hover:border-emerald hover:text-emerald"}`}>
+    <Link key={path} href={`${path}${keep.size ? `?${keep}` : ""}`} scroll={false} className={`flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full border px-5 text-xs font-bold uppercase tracking-[0.14em] transition ${on ? "border-emerald bg-emerald text-cream" : "border-ink/15 text-ink/70 hover:border-emerald hover:text-emerald"}`}>
       {label}
     </Link>
   );
 
   return (
-    <div className="sticky top-[76px] z-30 -mx-5 border-b border-ink/10 bg-cream/90 px-5 py-4 backdrop-blur-xl lg:top-[88px] lg:-mx-8 lg:px-8">
+    // Sticky from tablets up; on phones it would eat a third of the screen, so it scrolls away with the page.
+    <div className="relative z-30 -mx-5 border-b border-ink/10 bg-cream px-5 py-4 md:sticky md:top-[76px] md:bg-cream/95 lg:top-[88px] lg:-mx-8 lg:bg-cream/90 lg:px-8 lg:backdrop-blur-xl">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 lg:mx-0 lg:px-0">
+        <div className="scroll-row -mx-5 flex scroll-px-5 gap-2 px-5 lg:mx-0 lg:px-0">
           {chip("/shop", "All", !active)}
           {cats.map((c) => chip(`/collections/${c.slug}`, c.name, active === c.slug))}
         </div>
-        <div className="grid grid-cols-[minmax(0,1fr)_9rem] items-center gap-2 lg:flex">
-          <label className="flex min-w-0 items-center gap-2 rounded-full border border-ink/15 bg-white px-4 py-2.5 focus-within:border-emerald lg:w-64 lg:flex-none">
-            <Search className="size-4 text-muted" />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search perfumes" aria-label="Search perfumes" className="w-full bg-transparent text-sm focus:outline-none" />
+        <div className="grid grid-cols-[minmax(0,1fr)_8.5rem] items-center gap-2 lg:flex">
+          <label className="flex min-h-11 min-w-0 items-center gap-2 rounded-full border border-ink/15 bg-white px-4 focus-within:border-emerald lg:w-64 lg:flex-none">
+            <Search className="size-4 shrink-0 text-muted" />
+            <input type="search" enterKeyHint="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search perfumes" aria-label="Search perfumes" className="w-full min-w-0 bg-transparent py-2 text-sm focus:outline-none" />
           </label>
-          <label className="flex min-w-0 items-center gap-2 rounded-full border border-ink/15 bg-white px-4 py-2.5 lg:w-52">
-            <SlidersHorizontal className="size-4 text-muted" />
-            <select value={sort ?? ""} onChange={(e) => push({ sort: e.target.value })} aria-label="Sort by" className="w-full min-w-0 bg-transparent text-sm focus:outline-none">
+          <label className="flex min-h-11 min-w-0 items-center gap-2 rounded-full border border-ink/15 bg-white pl-4 pr-2 lg:w-52">
+            <SlidersHorizontal className="size-4 shrink-0 text-muted" />
+            <select value={sort ?? ""} onChange={(e) => push({ sort: e.target.value })} aria-label="Sort by" className="w-full min-w-0 bg-transparent py-2 text-sm focus:outline-none">
               <option value="">Newest</option>
               <option value="popular">Bestselling</option>
               <option value="price-asc">Price: low to high</option>

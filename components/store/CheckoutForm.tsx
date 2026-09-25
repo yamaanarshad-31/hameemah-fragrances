@@ -85,8 +85,8 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
     );
 
   return (
-    <form onSubmit={submit} onChange={(e) => clearError((e.nativeEvent.target as HTMLInputElement).name)} noValidate={false} className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
-      <div className="space-y-8">
+    <form onSubmit={submit} onChange={(e) => clearError((e.nativeEvent.target as HTMLInputElement).name)} noValidate={false} className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+      <div className="min-w-0 space-y-8">
         {errors.items && <p className="rounded-xl bg-red-50 p-4 text-red-800">{errors.items}</p>}
         <section>
           <h2 className="font-display text-3xl">Delivery details</h2>
@@ -122,10 +122,10 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
         </section>
       </div>
 
-      <aside className="lg:sticky lg:top-28 lg:self-start">
-        <div className="rounded-[2rem] bg-white p-6 shadow-[0_30px_70px_-40px_rgba(6,20,13,.5)]">
+      <aside className="min-w-0 lg:sticky lg:top-28 lg:self-start">
+        <div className="rounded-[2rem] bg-white p-5 shadow-[0_30px_70px_-40px_rgba(6,20,13,.5)] sm:p-6">
           <h2 className="font-display text-3xl">Order summary</h2>
-          <ul className="mt-5 max-h-72 space-y-4 overflow-y-auto pr-1" data-lenis-prevent>
+          <ul className="mt-5 max-h-72 space-y-4 overflow-y-auto overscroll-contain pr-1 pt-1" data-lenis-prevent>
             {lines.map((l) => (
               <li key={l.productId + l.size} className="flex items-center gap-3">
                 <div className="relative h-16 w-14 shrink-0 overflow-hidden rounded-lg bg-gradient-to-b from-emerald to-forest">
@@ -133,16 +133,16 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
                   <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-gold text-[0.65rem] font-bold">{l.qty}</span>
                 </div>
                 <div className="min-w-0 flex-1"><p className="truncate font-semibold">{l.name}</p><p className="text-xs text-muted">{l.size}</p></div>
-                <p className="font-semibold">{rs(l.price * l.qty)}</p>
+                <p className="whitespace-nowrap font-semibold">{rs(l.price * l.qty)}</p>
               </li>
             ))}
           </ul>
           <div className="mt-5 flex gap-2">
-            <label className="flex flex-1 items-center gap-2 rounded-xl border border-ink/15 px-3 focus-within:border-emerald">
-              <Tag className="size-4 text-muted" />
-              <input value={code} onChange={(e) => { setCode(e.target.value.toUpperCase()); clearError("coupon"); }} placeholder="Discount code" aria-label="Discount code" className="w-full bg-transparent py-3 text-sm uppercase focus:outline-none" />
+            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-ink/15 px-3 focus-within:border-emerald">
+              <Tag className="size-4 shrink-0 text-muted" />
+              <input value={code} onChange={(e) => { setCode(e.target.value.toUpperCase()); clearError("coupon"); }} placeholder="Discount code" aria-label="Discount code" className="w-full min-w-0 bg-transparent py-3 text-sm uppercase focus:outline-none" />
             </label>
-            <button type="button" onClick={apply} disabled={!code || checking} className="rounded-xl bg-ink px-5 text-sm font-bold text-cream disabled:opacity-50">{checking ? "…" : "Apply"}</button>
+            <button type="button" onClick={apply} disabled={!code || checking} className="min-h-11 shrink-0 rounded-xl bg-ink px-5 text-sm font-bold text-cream disabled:opacity-50">{checking ? "…" : "Apply"}</button>
           </div>
           {(couponMsg || errors.coupon) && <p className={`mt-2 text-sm ${coupon ? "text-emerald" : "text-red-700"}`}>{errors.coupon || couponMsg}</p>}
 
@@ -152,7 +152,7 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
             <div className="flex justify-between"><dt>Delivery</dt><dd>{shipping ? rs(shipping) : <span className="font-semibold text-emerald">FREE</span>}</dd></div>
             <div className="flex justify-between border-t border-ink/10 pt-3 font-display text-2xl"><dt>Total</dt><dd className="font-semibold text-emerald">{rs(total)}</dd></div>
           </dl>
-          <button disabled={pending} className="btn-gold mt-6 w-full rounded-full py-4 text-sm font-bold uppercase tracking-[0.2em] disabled:opacity-60">
+          <button disabled={pending} className="btn-gold mt-6 w-full rounded-full px-4 py-4 text-sm font-bold uppercase tracking-[0.12em] disabled:opacity-60 sm:tracking-[0.2em]">
             {pending ? "Placing order…" : `Place order · ${rs(total)}`}
           </button>
           <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted"><Lock className="size-3.5" /> Your details are safe with us</p>

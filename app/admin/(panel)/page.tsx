@@ -46,38 +46,58 @@ export default async function Dashboard() {
   return (
     <>
       <PageTitle title="Dashboard" sub={`Welcome back — here's how the store is doing. ${orders.some((o) => o.orderNo.startsWith("DEMO-")) ? "(Includes demo orders — remove them in Settings.)" : ""}`} />
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
         {kpis.map(({ t, v, s: sub, I, hot }) => (
           <Card key={t} className={hot ? "!bg-emerald text-cream" : ""}>
             <div className="flex items-center justify-between"><p className={`text-sm ${hot ? "text-cream/70" : "text-muted"}`}>{t}</p><I className={`size-5 ${hot ? "text-gold" : "text-gold-3"}`} /></div>
-            <p className="mt-3 font-display text-4xl font-semibold tabular-nums">{v}</p>
+            <p className="mt-2 font-display text-[2rem] font-semibold leading-tight tabular-nums sm:mt-3 sm:text-4xl">{v}</p>
             <p className={`mt-1 text-xs ${hot ? "text-cream/60" : "text-muted"}`}>{sub}</p>
           </Card>
         ))}
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[2fr_1fr]">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <Card>
           <p className="font-semibold">Revenue · last 30 days</p>
           <RevenueChart data={series} />
         </Card>
         <Card>
           <p className="font-semibold">Orders by status</p>
-          <ul className="mt-4 space-y-3">
+          <ul className="mt-3 space-y-1">
             {byStatus.map(({ st, n }) => (
-              <li key={st} className="flex items-center justify-between">
-                <StatusBadge status={st} />
-                <Link href={`/admin/orders?status=${st}`} className="font-semibold tabular-nums hover:text-emerald">{n}</Link>
+              <li key={st}>
+                <Link href={`/admin/orders?status=${st}`} className="-mx-2 flex min-h-11 items-center justify-between rounded-xl px-2 hover:bg-black/[.03]">
+                  <StatusBadge status={st} />
+                  <span className="font-semibold tabular-nums">{n}</span>
+                </Link>
               </li>
             ))}
           </ul>
         </Card>
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[2fr_1fr]">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <Card>
-          <div className="flex items-center justify-between"><p className="font-semibold">Recent orders</p><Link href="/admin/orders" className="flex items-center gap-1 text-sm font-semibold text-emerald">View all <ArrowRight className="size-4" /></Link></div>
-          <div className="mt-3 overflow-x-auto">
+          <div className="flex items-center justify-between"><p className="font-semibold">Recent orders</p><Link href="/admin/orders" className="-mr-2 flex min-h-11 items-center gap-1 px-2 text-sm font-semibold text-emerald">View all <ArrowRight className="size-4" /></Link></div>
+          {/* phones: one tappable row per order */}
+          <ul className="mt-2 divide-y divide-black/5 sm:hidden">
+            {orders.slice(0, 7).map((o) => (
+              <li key={o.id}>
+                <Link href={`/admin/orders/${o.id}`} className="flex items-center justify-between gap-3 py-3">
+                  <span className="min-w-0">
+                    <span className="block font-semibold text-emerald">{o.orderNo}</span>
+                    <span className="block truncate text-xs text-muted">{o.name} · {o.city}</span>
+                  </span>
+                  <span className="flex shrink-0 flex-col items-end gap-1">
+                    <span className="text-sm font-semibold tabular-nums">{rs(o.total)}</span>
+                    <StatusBadge status={o.status ?? "pending"} />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {!orders.length && <p className="py-8 text-center text-muted sm:hidden">No orders yet.</p>}
+          <div className="mt-3 hidden overflow-x-auto sm:block">
             <table className="w-full min-w-[520px] text-sm">
               <thead><tr className="text-left text-xs uppercase tracking-wider text-muted"><th className="py-2">Order</th><th>Customer</th><th>Status</th><th className="text-right">Total</th></tr></thead>
               <tbody>
@@ -100,7 +120,7 @@ export default async function Dashboard() {
             <ul className="mt-4 space-y-3">
               {top.map((p) => (
                 <li key={p.id}>
-                  <div className="flex justify-between text-sm"><Link href={`/admin/products/${p.id}`} className="hover:text-emerald">{p.name}</Link><span className="tabular-nums text-muted">{p.sold} sold</span></div>
+                  <div className="flex justify-between gap-3 text-sm"><Link href={`/admin/products/${p.id}`} className="min-w-0 truncate hover:text-emerald">{p.name}</Link><span className="shrink-0 tabular-nums text-muted">{p.sold} sold</span></div>
                   <div className="mt-1 h-1.5 rounded-full bg-black/5"><div className="h-full rounded-full bg-emerald" style={{ width: `${((p.sold ?? 0) / topMax) * 100}%` }} /></div>
                 </li>
               ))}
@@ -110,7 +130,7 @@ export default async function Dashboard() {
             <p className="flex items-center gap-2 font-semibold"><AlertTriangle className="size-4 text-amber-600" /> Low stock</p>
             {low.length ? (
               <ul className="mt-3 divide-y divide-black/5 text-sm">
-                {low.map(({ p, v }) => <li key={p.id + v.size} className="flex justify-between py-2"><Link href={`/admin/products/${p.id}`} className="hover:text-emerald">{p.name} · {v.size}</Link><span className={`font-semibold ${v.stock === 0 ? "text-red-700" : "text-amber-700"}`}>{v.stock === 0 ? "Out" : `${v.stock} left`}</span></li>)}
+                {low.map(({ p, v }) => <li key={p.id + v.size} className="flex justify-between gap-3 py-2"><Link href={`/admin/products/${p.id}`} className="hover:text-emerald">{p.name} · {v.size}</Link><span className={`font-semibold ${v.stock === 0 ? "text-red-700" : "text-amber-700"}`}>{v.stock === 0 ? "Out" : `${v.stock} left`}</span></li>)}
               </ul>
             ) : <p className="mt-2 text-sm text-muted">All sizes are well stocked.</p>}
           </Card>

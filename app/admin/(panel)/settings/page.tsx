@@ -18,14 +18,14 @@ export default async function Settings() {
   return (
     <>
       <PageTitle title="Settings" sub="Changes go live on the store as soon as you save." />
-      <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
+      <div className="grid grid-cols-1 gap-6 pb-24 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <SettingsForm s={settings} />
         <div className="space-y-6">
           {demo.n > 0 && (
             <Card className="border-l-4 !border-l-gold">
               <p className="font-semibold">Demo orders</p>
               <p className="mt-1 text-sm text-muted">{demo.n} sample orders (and sample “sold” counts) were added so the dashboard isn&apos;t empty. Remove them before you go live.</p>
-              <ActionButton action={removeDemoOrders} confirmText="Delete all demo orders?" className="mt-4 rounded-xl bg-ink px-4 py-2.5 text-sm font-semibold text-cream">Remove demo orders</ActionButton>
+              <ActionButton action={removeDemoOrders} confirmText="Delete all demo orders?" className="mt-4 min-h-11 rounded-xl bg-ink px-4 py-2.5 text-sm font-semibold text-cream">Remove demo orders</ActionButton>
             </Card>
           )}
           <Card>

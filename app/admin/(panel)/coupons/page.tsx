@@ -14,9 +14,21 @@ export default async function Coupons() {
   return (
     <>
       <PageTitle title="Discount codes" sub="Customers enter these at checkout. Tip: put an active code in the announcement bar." />
-      <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <Card className="!p-0">
-          <table className="w-full text-sm">
+          <ul className="divide-y divide-black/5 sm:hidden">
+            {rows.map((c) => (
+              <li key={c.id} className="flex items-center gap-3 p-4">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-mono font-bold">{c.code}</p>
+                  <p className="text-xs text-muted">{c.percent}% off{c.minTotal ? ` · min. ${rs(c.minTotal)}` : ""} · used {c.uses}×</p>
+                </div>
+                <ActionButton action={toggleCoupon.bind(null, c.id, !c.active)} className={`min-h-10 rounded-full px-3.5 text-xs font-semibold ${c.active ? "bg-emerald-100 text-emerald-900" : "bg-black/5 text-muted"}`}>{c.active ? "Active" : "Paused"}</ActionButton>
+                <ActionButton action={deleteCoupon.bind(null, c.id)} label={`Delete ${c.code}`} confirmText={`Delete ${c.code}?`} className="-mr-2 flex size-11 items-center justify-center rounded-lg text-muted hover:bg-red-50 hover:text-red-700"><Trash2 className="size-4" /></ActionButton>
+              </li>
+            ))}
+          </ul>
+          <table className="hidden w-full text-sm sm:table">
             <thead><tr className="text-left text-xs uppercase tracking-wider text-muted"><th className="px-4 py-3">Code</th><th>Discount</th><th>Min. order</th><th>Used</th><th>Status</th><th /></tr></thead>
             <tbody>
               {rows.map((c) => (
@@ -38,10 +50,10 @@ export default async function Coupons() {
           <form action={saveCoupon} className="mt-4 space-y-3">
             <label className="block"><span className={labelCls}>Code</span><input name="code" required className={`${inputCls} mt-1 uppercase`} placeholder="EID20" /></label>
             <div className="flex gap-3">
-              <label className="block flex-1"><span className={labelCls}>% off</span><input name="percent" type="number" min={1} max={90} required defaultValue={10} className={`${inputCls} mt-1`} /></label>
-              <label className="block flex-1"><span className={labelCls}>Min. order (Rs.)</span><input name="minTotal" type="number" min={0} defaultValue={0} className={`${inputCls} mt-1`} /></label>
+              <label className="block min-w-0 flex-1"><span className={labelCls}>% off</span><input name="percent" type="number" min={1} max={90} required defaultValue={10} className={`${inputCls} mt-1`} /></label>
+              <label className="block min-w-0 flex-1"><span className={labelCls}>Min. order (Rs.)</span><input name="minTotal" type="number" min={0} defaultValue={0} className={`${inputCls} mt-1`} /></label>
             </div>
-            <button className="btn-gold w-full rounded-xl py-3 text-sm font-bold">Save code</button>
+            <button className="btn-gold min-h-11 w-full rounded-xl py-3 text-sm font-bold">Save code</button>
           </form>
         </Card>
       </div>

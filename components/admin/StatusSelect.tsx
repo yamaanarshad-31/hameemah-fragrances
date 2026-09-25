@@ -21,7 +21,7 @@ export function StatusSelect({ id, status }: { id: number; status: string }) {
         if (v === "cancelled" && !confirm("Cancel this order? Its items go back into stock.")) return;
         start(async () => { setOpt(v); await setOrderStatus(id, v); });
       }}
-      className={`cursor-pointer rounded-full border-0 px-3 py-1.5 text-xs font-semibold capitalize focus:ring-2 focus:ring-emerald/30 ${CLS[opt]}`}
+      className={`min-h-10 cursor-pointer rounded-full border-0 px-3 py-1.5 text-xs font-semibold capitalize lg:min-h-0 focus:ring-2 focus:ring-emerald/30 ${CLS[opt]}`}
     >
       {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
     </select>

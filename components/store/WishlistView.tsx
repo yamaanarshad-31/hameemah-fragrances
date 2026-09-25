@@ -21,5 +21,5 @@ export function WishlistView() {
         <Link href="/shop" className="btn-gold mt-6 inline-flex rounded-full px-7 py-3 text-sm font-bold uppercase tracking-widest">Browse perfumes</Link>
       </div>
     );
-  return <div className="grid grid-cols-2 gap-x-4 gap-y-10 py-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">{items.map((p, i) => <ProductCard key={p.id} p={p} index={i} />)}</div>;
+  return <div className="grid grid-cols-2 gap-x-3 gap-y-10 py-8 sm:gap-x-4 sm:py-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">{items.map((p, i) => <ProductCard key={p.id} p={p} index={i} />)}</div>;
 }

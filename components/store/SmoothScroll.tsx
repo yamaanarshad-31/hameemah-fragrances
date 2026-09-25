@@ -9,22 +9,16 @@ export const getLenis = () => lenis;
 export function SmoothScroll() {
   const path = usePathname();
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    lenis = new Lenis({ duration: 1.15, smoothWheel: true });
-    let raf = 0;
-    const loop = (t: number) => {
-      lenis?.raf(t);
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
+    // Phones and tablets keep their own native momentum scrolling; wheel smoothing is for mouse/trackpad only.
+    if (window.matchMedia("(prefers-reduced-motion: reduce), (hover: none), (pointer: coarse)").matches) return;
+    lenis = new Lenis({ duration: 1.1, smoothWheel: true, syncTouch: false, autoRaf: true });
     return () => {
-      cancelAnimationFrame(raf);
       lenis?.destroy();
       lenis = null;
     };
   }, []);
   useEffect(() => {
-    lenis?.scrollTo(0, { immediate: true });
+    if (lenis) lenis.scrollTo(0, { immediate: true });
   }, [path]);
   return null;
 }

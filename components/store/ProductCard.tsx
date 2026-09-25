@@ -1,8 +1,10 @@
 "use client";
 import Link from "next/link";
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
-import { Heart, Plus, Star } from "lucide-react";
+import { Heart, Plus } from "lucide-react";
+import { Stars } from "./Stars";
 import { useCart } from "./cart";
+import { isMouse } from "./useLite";
 import { ProductImage } from "./ProductImage";
 import { discountPct, minPrice, rs } from "@/lib/format";
 import type { Variant } from "@/lib/db/schema";
@@ -41,6 +43,7 @@ export function ProductCard({ p, index = 0, dark = false, eager = false }: { p: 
       <motion.div
         style={{ rotateX: rx, rotateY: ry, transformPerspective: 900 }}
         onPointerMove={(e) => {
+          if (!isMouse(e)) return;
           const r = e.currentTarget.getBoundingClientRect();
           mx.set((e.clientX - r.left) / r.width);
           my.set((e.clientY - r.top) / r.height);
@@ -64,14 +67,16 @@ export function ProductCard({ p, index = 0, dark = false, eager = false }: { p: 
           onClick={() => { toggleWish(p.id); notify(liked ? "Removed from wishlist" : "Saved to wishlist ♥"); }}
           aria-label={liked ? "Remove from wishlist" : "Add to wishlist"}
           aria-pressed={liked}
-          className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full bg-ink/40 text-cream backdrop-blur transition hover:bg-gold hover:text-ink"
+          className="group/w absolute right-1.5 top-1.5 flex size-11 items-center justify-center text-cream"
         >
-          <Heart className={`size-4 ${liked ? "fill-gold text-gold group-hover:text-ink" : ""}`} />
+          <span className="flex size-9 items-center justify-center rounded-full bg-ink/55 transition group-hover/w:bg-gold group-hover/w:text-ink">
+            <Heart className={`size-4 ${liked ? "fill-gold text-gold group-hover/w:text-ink" : ""}`} />
+          </span>
         </button>
         {inStock && (
           <button
             onClick={quickAdd}
-            className="absolute inset-x-3 bottom-3 flex translate-y-0 items-center justify-center gap-2 rounded-full bg-cream/95 py-3 text-xs font-bold uppercase tracking-[0.16em] text-ink opacity-100 backdrop-blur transition duration-500 hover:bg-gold md:translate-y-[130%] md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100"
+            className="absolute inset-x-2.5 bottom-2.5 flex min-h-11 translate-y-0 items-center justify-center gap-1.5 rounded-full bg-cream/95 py-2.5 text-[0.7rem] font-bold uppercase tracking-[0.12em] text-ink opacity-100 transition duration-500 hover:bg-gold active:scale-[.97] sm:inset-x-3 sm:bottom-3 sm:gap-2 sm:text-xs sm:tracking-[0.16em] md:translate-y-[130%] md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100"
           >
             <Plus className="size-4" /> Quick add
           </button>
@@ -81,17 +86,17 @@ export function ProductCard({ p, index = 0, dark = false, eager = false }: { p: 
       <Link href={`/product/${p.slug}`} className="mt-4 block px-1">
         {p.reviewCount > 0 ? (
           <div className="flex items-center gap-1 text-gold">
-            {Array.from({ length: 5 }, (_, i) => <Star key={i} className={`size-3.5 ${i < Math.round(p.rating) ? "fill-gold" : "opacity-30"}`} />)}
+            <Stars value={p.rating} size={14} />
             <span className={`ml-1 text-xs ${dark ? "text-cream/50" : "text-muted"}`}>({p.reviewCount})</span>
           </div>
         ) : (
           <p className={`eyebrow !text-[0.6rem] ${dark ? "text-gold/70" : "text-gold-3"}`}>{p.categoryName ?? "Fragrance"}</p>
         )}
-        <h3 className={`mt-1 font-display text-2xl leading-tight transition-colors group-hover:text-gold-3 ${dark ? "text-cream" : "text-ink"}`}>{p.name}</h3>
+        <h3 className={`mt-1 font-display text-[1.35rem] leading-tight sm:text-2xl transition-colors group-hover:text-gold-3 ${dark ? "text-cream" : "text-ink"}`}>{p.name}</h3>
         <p className={`line-clamp-1 text-sm ${dark ? "text-cream/55" : "text-muted"}`}>{p.tagline}</p>
-        <p className="mt-1.5 flex items-baseline gap-2">
-          <span className={`font-semibold ${dark ? "text-gold-2" : "text-emerald"}`}>{p.variants.length > 1 ? "From " : ""}{rs(v.price)}</span>
-          {v.compareAt ? <s className={`text-sm ${dark ? "text-cream/40" : "text-muted"}`}>{rs(v.compareAt)}</s> : null}
+        <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2">
+          <span className={`whitespace-nowrap font-semibold ${dark ? "text-gold-2" : "text-emerald"}`}>{p.variants.length > 1 ? "From " : ""}{rs(v.price)}</span>
+          {v.compareAt ? <s className={`whitespace-nowrap text-sm ${dark ? "text-cream/40" : "text-muted"}`}>{rs(v.compareAt)}</s> : null}
         </p>
       </Link>
     </motion.article>

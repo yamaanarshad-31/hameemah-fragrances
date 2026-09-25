@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/home/Hero";
 import { BottleBand, Categories, ReviewWall, WhyUs, WordMarquee } from "@/components/home/Sections";
-import { ProductTabs } from "@/components/home/ProductTabs";
+import { HomeCards, ProductTabs } from "@/components/home/ProductTabs";
 import { ScentAnatomy } from "@/components/home/ScentAnatomy";
 import { ScentFinder } from "@/components/home/ScentFinder";
 import { Faq } from "@/components/home/Faq";
@@ -29,15 +29,17 @@ export default async function Home() {
   const sample: Record<number, { color: string | null; shape: number | null }> = {};
   for (const p of all) if (p.categoryId && !sample[p.categoryId]) sample[p.categoryId] = { color: p.color, shape: p.shape };
 
+  // Each product crosses to the client once; tabs and the scent finder refer to it by id (keeps the page payload small).
+  const cards = all.map(toCard);
   const bySold = all.filter((p) => p.bestseller);
   const newest = [...all].filter((p) => p.isNew).sort((a, b) => b.createdAt - a.createdAt);
   const tabs = [
-    { key: "best", label: "Bestsellers", items: (bySold.length ? bySold : all).map(toCard) },
-    { key: "new", label: "New in", items: (newest.length ? newest : all).map(toCard) },
-    { key: "all", label: "All", items: all.map(toCard) },
+    { key: "best", label: "Bestsellers", ids: (bySold.length ? bySold : all).map((p) => p.id) },
+    { key: "new", label: "New in", ids: (newest.length ? newest : all).map((p) => p.id) },
+    { key: "all", label: "All", ids: all.map((p) => p.id) },
   ];
   const anatomy = all.find((p) => p.featured && p.topNotes) ?? all[0];
-  const finder = all.map((p) => ({ ...toCard(p), categorySlug: p.categorySlug, notes: `${p.topNotes} ${p.heartNotes} ${p.baseNotes}`, longevity: p.longevity, sillage: p.sillage }));
+  const finder = all.map((p) => ({ id: p.id, categorySlug: p.categorySlug, notes: `${p.topNotes} ${p.heartNotes} ${p.baseNotes}`, longevity: p.longevity, sillage: p.sillage }));
   const freeOver = Number(settings.freeShippingOver) || 0;
 
   // Store + WebSite markup lives in the store layout; the FAQ is specific to this page.
@@ -49,9 +51,11 @@ export default async function Home() {
       <Hero items={heroItems} title={settings.heroTitle} subtitle={settings.heroSubtitle} freeOver={freeOver} />
       <WordMarquee />
       <Categories cats={cats} sample={sample} />
-      <ProductTabs tabs={tabs} />
-      {anatomy && <ScentAnatomy p={anatomy} />}
-      <ScentFinder products={finder} />
+      <HomeCards cards={cards}>
+        <ProductTabs tabs={tabs} />
+        {anatomy && <ScentAnatomy p={{ name: anatomy.name, slug: anatomy.slug, color: anatomy.color, shape: anatomy.shape, topNotes: anatomy.topNotes, heartNotes: anatomy.heartNotes, baseNotes: anatomy.baseNotes }} />}
+        <ScentFinder products={finder} />
+      </HomeCards>
       <ReviewWall reviews={reviews} />
       <BottleBand />
       <WhyUs freeOver={freeOver} />

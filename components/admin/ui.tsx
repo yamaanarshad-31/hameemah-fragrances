@@ -2,9 +2,9 @@ import Link from "next/link";
 
 export function PageTitle({ title, sub, action }: { title: string; sub?: string; action?: React.ReactNode }) {
   return (
-    <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1 className="font-display text-4xl font-semibold sm:text-5xl">{title}</h1>
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-4 sm:mb-8">
+      <div className="min-w-0">
+        <h1 className="break-words font-display text-[2.1rem] font-semibold leading-tight sm:text-5xl">{title}</h1>
         {sub && <p className="mt-1 text-sm text-muted">{sub}</p>}
       </div>
       {action}
@@ -13,11 +13,11 @@ export function PageTitle({ title, sub, action }: { title: string; sub?: string;
 }
 
 export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`rounded-2xl border border-black/5 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,.04),0_12px_30px_-20px_rgba(6,20,13,.25)] ${className}`}>{children}</div>;
+  return <div className={`min-w-0 rounded-2xl border border-black/5 bg-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,.04),0_12px_30px_-20px_rgba(6,20,13,.25)] ${className}`}>{children}</div>;
 }
 
 export function ButtonLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return <Link href={href} className="inline-flex items-center gap-2 rounded-xl bg-emerald px-5 py-3 text-sm font-semibold text-cream shadow-sm transition hover:bg-emerald-2">{children}</Link>;
+  return <Link href={href} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-emerald px-5 py-3 text-sm font-semibold text-cream shadow-sm transition hover:bg-emerald-2">{children}</Link>;
 }
 
 const STATUS_STYLE: Record<string, string> = {

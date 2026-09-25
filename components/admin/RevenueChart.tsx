@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { rs } from "@/lib/format";
 
 type Pt = { day: string; label: string; revenue: number; orders: number };
@@ -8,7 +8,19 @@ type Pt = { day: string; label: string; revenue: number; orders: number };
 export function RevenueChart({ data }: { data: Pt[] }) {
   const [hover, setHover] = useState<number | null>(null);
   const [table, setTable] = useState(false);
-  const W = 720, H = 240, L = 56, R = 12, T = 12, B = 28;
+  // draw at the real pixel width so the axis text stays readable on a phone instead of shrinking with the SVG
+  const box = useRef<HTMLDivElement>(null);
+  const [W, setW] = useState(720);
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => setW(Math.max(260, Math.round(e.contentRect.width))));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [table]);
+  const narrow = W < 480;
+  const H = narrow ? 200 : 240, L = narrow ? 40 : 56, R = 12, T = 12, B = 28;
+  const every = narrow ? 7 : 5;
   const max = Math.max(1000, ...data.map((d) => d.revenue));
   const nice = Math.ceil(max / Math.pow(10, Math.floor(Math.log10(max)))) * Math.pow(10, Math.floor(Math.log10(max)));
   const x = (i: number) => L + (i * (W - L - R)) / Math.max(1, data.length - 1);
@@ -21,7 +33,7 @@ export function RevenueChart({ data }: { data: Pt[] }) {
   return (
     <div>
       <div className="mb-2 flex justify-end">
-        <button onClick={() => setTable((t) => !t)} className="text-xs font-semibold text-emerald underline-offset-4 hover:underline">{table ? "Show chart" : "Show as table"}</button>
+        <button onClick={() => setTable((t) => !t)} className="-my-2 min-h-11 px-1 text-xs font-semibold text-emerald underline-offset-4 hover:underline">{table ? "Show chart" : "Show as table"}</button>
       </div>
       {table ? (
         <div className="max-h-64 overflow-y-auto text-sm">
@@ -29,9 +41,14 @@ export function RevenueChart({ data }: { data: Pt[] }) {
             <tbody>{data.map((d) => <tr key={d.day} className="border-t border-black/5"><td className="py-1.5">{d.label}</td><td>{d.orders}</td><td className="text-right tabular-nums">{rs(d.revenue)}</td></tr>)}</tbody></table>
         </div>
       ) : (
-        <div className="relative">
-          <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Revenue per day, last 30 days" onMouseLeave={() => setHover(null)}
-            onMouseMove={(e) => {
+        <div ref={box} className="relative">
+          <svg viewBox={`0 0 ${W} ${H}`} className="w-full touch-pan-y" role="img" aria-label="Revenue per day, last 30 days" onPointerLeave={() => setHover(null)}
+            onPointerDown={(e) => {
+              const r = e.currentTarget.getBoundingClientRect();
+              const px = ((e.clientX - r.left) / r.width) * W;
+              setHover(Math.max(0, Math.min(data.length - 1, Math.round(((px - L) / (W - L - R)) * (data.length - 1)))));
+            }}
+            onPointerMove={(e) => {
               const r = e.currentTarget.getBoundingClientRect();
               const px = ((e.clientX - r.left) / r.width) * W;
               setHover(Math.max(0, Math.min(data.length - 1, Math.round(((px - L) / (W - L - R)) * (data.length - 1)))));
@@ -45,7 +62,11 @@ export function RevenueChart({ data }: { data: Pt[] }) {
                 <text x={L - 8} y={y(t) + 4} textAnchor="end" fontSize="11" fill="#6f7a72">{t >= 1000 ? `${Math.round(t / 1000)}k` : t}</text>
               </g>
             ))}
-            {data.map((d, i) => (i % 5 === 0 || i === data.length - 1) && <text key={d.day} x={x(i)} y={H - 8} textAnchor="middle" fontSize="11" fill="#6f7a72">{d.label}</text>)}
+            {data.map((d, i) => {
+              const last = i === data.length - 1;
+              if (!last && (i % every !== 0 || data.length - 1 - i < every / 2)) return null;
+              return <text key={d.day} x={last ? x(i) + R : x(i)} y={H - 8} textAnchor={last ? "end" : "middle"} fontSize="11" fill="#6f7a72">{d.label}</text>;
+            })}
             <path d={area} fill="url(#rev)" />
             <path d={line} fill="none" stroke="#0f3d2a" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
             {h && hover !== null && (

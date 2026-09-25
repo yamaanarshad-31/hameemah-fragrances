@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Heart, Menu, Search, ShoppingBag, X } from "lucide-react";
 import { useCart } from "./cart";
 import { SearchOverlay } from "./SearchOverlay";
-import { getLenis } from "./SmoothScroll";
+import { useScrollLock } from "./useScrollLock";
 
 type Cat = { name: string; slug: string };
 
@@ -21,17 +21,19 @@ export function Header({ categories }: { categories: Cat[] }) {
   const solid = scrolled || !overHero;
 
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 40);
-    on();
+    let raf = 0;
+    const read = () => { raf = 0; setScrolled(window.scrollY > 40); };
+    const on = () => { if (!raf) raf = requestAnimationFrame(read); };
+    read();
     window.addEventListener("scroll", on, { passive: true });
-    return () => window.removeEventListener("scroll", on);
+    return () => { window.removeEventListener("scroll", on); cancelAnimationFrame(raf); };
   }, []);
+  useScrollLock(menu || search);
   useEffect(() => {
     if (!menu) return;
-    const lenis = getLenis();
-    lenis?.stop();
-    document.body.style.overflow = "hidden";
-    return () => { lenis?.start(); document.body.style.overflow = ""; };
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && setMenu(false);
+    window.addEventListener("keydown", esc);
+    return () => window.removeEventListener("keydown", esc);
   }, [menu]);
   // eslint-disable-next-line react-hooks/set-state-in-effect -- close menus on navigation
   useEffect(() => { setMenu(false); setSearch(false); }, [path]);
@@ -46,11 +48,11 @@ export function Header({ categories }: { categories: Cat[] }) {
     <>
       <header
         className={`sticky top-0 z-40 transition-all duration-500 ${
-          solid ? "bg-forest/90 shadow-[0_10px_40px_-20px_rgba(0,0,0,.6)] backdrop-blur-xl" : "bg-transparent"
+          solid ? "bg-forest/95 shadow-[0_10px_40px_-20px_rgba(0,0,0,.6)] lg:bg-forest/85 lg:backdrop-blur-xl" : "bg-transparent"
         } ${overHero ? "-mb-[76px] lg:-mb-[88px]" : ""}`}
       >
-        <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between gap-4 px-4 lg:h-[88px] lg:px-8">
-          <button onClick={() => setMenu(true)} className="p-2 text-gold-2 lg:hidden" aria-label="Open menu">
+        <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between gap-2 px-2 sm:gap-4 sm:px-4 lg:h-[88px] lg:px-8">
+          <button onClick={() => setMenu(true)} className="flex size-11 items-center justify-center rounded-full text-gold-2 lg:hidden" aria-label="Open menu" aria-expanded={menu}>
             <Menu className="size-6" />
           </button>
 
@@ -74,15 +76,15 @@ export function Header({ categories }: { categories: Cat[] }) {
             })}
           </nav>
 
-          <div className="flex items-center gap-1 text-cream sm:gap-2">
-            <button onClick={() => setSearch(true)} className="rounded-full p-2.5 transition hover:bg-white/10 hover:text-gold-2" aria-label="Search">
+          <div className="flex items-center text-cream sm:gap-1">
+            <button onClick={() => setSearch(true)} className="flex size-11 items-center justify-center rounded-full transition hover:bg-white/10 hover:text-gold-2" aria-label="Search">
               <Search className="size-5" />
             </button>
-            <Link href="/wishlist" className="relative hidden rounded-full p-2.5 transition hover:bg-white/10 hover:text-gold-2 sm:block" aria-label="Wishlist">
+            <Link href="/wishlist" className="relative hidden size-11 items-center justify-center rounded-full transition hover:bg-white/10 hover:text-gold-2 sm:flex" aria-label="Wishlist">
               <Heart className="size-5" />
-              {wishlist.length > 0 && <span className="absolute right-1 top-1 size-2 rounded-full bg-gold" />}
+              {wishlist.length > 0 && <span className="absolute right-2 top-2 size-2 rounded-full bg-gold" />}
             </Link>
-            <button onClick={() => setOpen(true)} className="relative rounded-full p-2.5 transition hover:bg-white/10 hover:text-gold-2" aria-label={`Cart, ${count} items`}>
+            <button onClick={() => setOpen(true)} className="relative flex size-11 items-center justify-center rounded-full transition hover:bg-white/10 hover:text-gold-2" aria-label={`Cart, ${count} items`}>
               <ShoppingBag className="size-5" />
               <AnimatePresence>
                 {count > 0 && (
@@ -91,7 +93,7 @@ export function Header({ categories }: { categories: Cat[] }) {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     exit={{ scale: 0 }}
-                    className="absolute -right-0.5 -top-0.5 flex size-5 items-center justify-center rounded-full bg-gold text-[0.65rem] font-bold text-ink"
+                    className="absolute right-0 top-0 flex size-5 items-center justify-center rounded-full bg-gold text-[0.65rem] font-bold text-ink"
                   >
                     {count}
                   </motion.span>
@@ -104,15 +106,15 @@ export function Header({ categories }: { categories: Cat[] }) {
 
       <AnimatePresence>
         {menu && (
-          <motion.div className="fixed inset-0 z-50 bg-ink/95 backdrop-blur-xl lg:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <div className="flex h-[76px] items-center justify-between px-4">
-              <Image src="/brand/logo-mark.png" alt="" style={{ width: "auto" }} width={40} height={47} className="h-10 w-auto" />
-              <button onClick={() => setMenu(false)} className="p-2 text-gold-2" aria-label="Close menu"><X className="size-7" /></button>
+          <motion.div role="dialog" aria-modal="true" aria-label="Menu" data-lenis-prevent className="fixed inset-0 z-50 flex h-dvh flex-col bg-ink lg:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="flex h-[76px] shrink-0 items-center justify-between px-2 pt-[env(safe-area-inset-top)] sm:px-4">
+              <Image src="/brand/logo-mark.png" alt="" style={{ width: "auto" }} width={40} height={47} className="ml-2 h-10 w-auto" />
+              <button onClick={() => setMenu(false)} className="flex size-11 items-center justify-center rounded-full text-gold-2" aria-label="Close menu"><X className="size-7" /></button>
             </div>
-            <nav className="flex flex-col gap-1 px-8 pt-6">
+            <nav className="flex flex-1 flex-col overflow-y-auto overscroll-contain px-6 pb-[calc(2rem+env(safe-area-inset-bottom))] pt-2 sm:px-8 sm:pt-6">
               {[{ href: "/", label: "Home" }, ...nav, { href: "/wishlist", label: "Wishlist" }, { href: "/about", label: "Our Story" }, { href: "/contact", label: "Contact" }].map((n, i) => (
                 <motion.div key={n.href} initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 * i + 0.1 }}>
-                  <Link href={n.href} className="block border-b border-gold/15 py-4 font-display text-3xl text-cream hover:text-gold">
+                  <Link href={n.href} className={`block border-b border-gold/15 py-3.5 font-display text-[1.75rem] leading-tight sm:py-4 sm:text-3xl ${path === n.href ? "text-gold" : "text-cream hover:text-gold"}`}>
                     {n.label}
                   </Link>
                 </motion.div>

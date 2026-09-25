@@ -18,7 +18,7 @@ function F({ s, k, label, hint, area, type = "text" }: { s: S; k: string; label:
 export function SettingsForm({ s }: { s: S }) {
   const [state, action, pending] = useActionState(saveSettings, null);
   return (
-    <form action={action} className="space-y-6 pb-24">
+    <form action={action} className="min-w-0 space-y-6">
       <Card>
         <p className="mb-4 font-semibold">Home page</p>
         <div className="space-y-4">
@@ -47,10 +47,10 @@ export function SettingsForm({ s }: { s: S }) {
           <div className="sm:col-span-2"><F s={s} k="bankDetails" label="Bank / JazzCash / Easypaisa details" hint="Shown at checkout when the customer picks bank transfer." area /></div>
         </div>
       </Card>
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-black/5 bg-white/90 backdrop-blur lg:left-64">
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-black/5 bg-white/95 pb-[env(safe-area-inset-bottom)] lg:left-64 lg:bg-white/90 lg:backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-end gap-4 px-4 py-3 sm:px-6 lg:px-10">
           {state?.ok && <p className="mr-auto text-sm font-medium text-emerald">✓ Saved — the store is updated</p>}
-          <button disabled={pending} className="btn-gold rounded-xl px-7 py-2.5 text-sm font-bold disabled:opacity-60">{pending ? "Saving…" : "Save settings"}</button>
+          <button disabled={pending} className="btn-gold min-h-11 rounded-xl px-7 py-2.5 text-sm font-bold disabled:opacity-60">{pending ? "Saving…" : "Save settings"}</button>
         </div>
       </div>
     </form>
