@@ -118,6 +118,8 @@ export function Hero({ items, title, subtitle, freeOver }: { items: HeroItem[]; 
                 >
                   <Link href={`/product/${cur.slug}`} aria-label={cur.name} className="relative block h-full w-full">
                     <ProductImage src={cur.image} color={cur.color} shape={cur.shape} name={cur.name} priority sizes="(max-width:1024px) 90vw, 40vw" className={cur.image ? "rounded-full" : ""} />
+                    {/* feathers the photo's edge into the dark hero, with a hairline gold frame */}
+                    {cur.image && <span aria-hidden className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_0_48px_16px_rgba(6,20,13,.75)] ring-1 ring-gold/30" />}
                   </Link>
                 </motion.div>
               </AnimatePresence>
