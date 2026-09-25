@@ -1,19 +1,24 @@
 import "server-only";
 import { mkdirSync } from "node:fs";
-import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
+import type { LibSQLDatabase } from "drizzle-orm/libsql";
 import * as schema from "./schema";
 import { seed } from "./seed";
 
 // Local: a SQLite file. Production: set DATABASE_URL=libsql://… + DATABASE_AUTH_TOKEN (Turso).
-if (!process.env.DATABASE_URL) mkdirSync("data", { recursive: true });
-
-const client = createClient({
-  url: process.env.DATABASE_URL || "file:data/store.db",
-  authToken: process.env.DATABASE_AUTH_TOKEN,
-});
-
-const raw = drizzle(client, { schema });
+// A remote URL uses the fetch-based web client: the default client loads a native SQLite
+// binary, which is built for the machine that ran `npm install`, not the Linux server.
+async function connect() {
+  const url = process.env.DATABASE_URL;
+  if (url && !url.startsWith("file:")) {
+    const [{ createClient }, { drizzle }] = await Promise.all([import("@libsql/client/web"), import("drizzle-orm/libsql/web")]);
+    const client = createClient({ url, authToken: process.env.DATABASE_AUTH_TOKEN });
+    return { client, db: drizzle(client, { schema }) };
+  }
+  if (!url) mkdirSync("data", { recursive: true });
+  const [{ createClient }, { drizzle }] = await Promise.all([import("@libsql/client"), import("drizzle-orm/libsql")]);
+  const client = createClient({ url: url || "file:data/store.db" });
+  return { client, db: drizzle(client, { schema }) };
+}
 
 const DDL = [
   `CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, slug TEXT NOT NULL UNIQUE, blurb TEXT DEFAULT '', color TEXT DEFAULT '#0f3d2a', sort INTEGER DEFAULT 0)`,
@@ -28,21 +33,24 @@ const DDL = [
   `CREATE INDEX IF NOT EXISTS idx_reviews_product ON reviews(product_id)`,
 ];
 
-let ready: Promise<void> | null = null;
+export type DB = LibSQLDatabase<typeof schema>;
+
+let ready: Promise<DB> | null = null;
 
 /** Creates tables on first use and fills an empty store with starter products. */
 export function getDb() {
   if (!ready) {
     ready = (async () => {
+      const { client, db } = await connect();
       await client.batch(DDL, "write");
-      await seed(raw);
+      await seed(db);
+      return db;
     })().catch((e) => {
       ready = null;
       throw e;
     });
   }
-  return ready.then(() => raw);
+  return ready;
 }
 
-export type DB = typeof raw;
 export { schema };
