@@ -47,7 +47,7 @@ export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) 
       const r = await fetch("/api/admin/upload", { method: "POST", body: fd });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error);
-      set("images", [...p.images, ...j.urls].slice(0, 8));
+      setP((x) => ({ ...x, images: [...x.images, ...j.urls].slice(0, 8) })); setSaved(false);
     } catch (e) { setErr((e as Error).message || "Upload failed"); }
     setUploading(false);
   };

@@ -5,7 +5,7 @@ export function ProductImage({ src, color, shape, name, alt, sizes = "(max-width
   src?: string | null; color?: string | null; shape?: number | null; name: string; alt?: string; sizes?: string; priority?: boolean; className?: string;
 }) {
   if (src) {
-    return <Image src={src} alt={alt ?? name} fill sizes={sizes} priority={priority} className={`object-cover ${className}`} />;
+    return <Image src={src} alt={alt ?? name} fill sizes={sizes} loading={priority ? "eager" : undefined} fetchPriority={priority ? "high" : undefined} className={`object-cover ${className}`} />;
   }
   return (
     <div className={`absolute inset-0 flex items-center justify-center ${className}`}>

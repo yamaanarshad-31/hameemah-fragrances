@@ -8,6 +8,7 @@ export const metadata = { title: "Edit product" };
 
 export default async function EditProduct({ params }: PageProps<"/admin/products/[id]">) {
   const id = Number((await params).id);
+  if (!Number.isInteger(id)) notFound();
   const db = await getDb();
   const [[p], cats] = await Promise.all([
     db.select().from(s.products).where(eq(s.products.id, id)),

@@ -41,7 +41,7 @@ export function Sidebar({ pending, reviews }: { pending: number; reviews: number
   );
   const brand = (
     <Link href="/admin" className="flex items-center gap-3 px-6 py-6">
-      <Image src="/brand/logo-mark.png" alt="" style={{ width: "auto" }} width={34} height={43} className="h-10 w-auto" />
+      <Image src="/brand/logo-mark.png" alt="" style={{ width: "auto" }} width={34} height={40} className="h-10 w-auto" />
       <span className="leading-tight"><span className="block font-caps text-sm tracking-[0.2em] text-gold-2">HAMEEMAH</span><span className="text-[0.65rem] uppercase tracking-[0.3em] text-cream/40">Admin</span></span>
     </Link>
   );
@@ -49,7 +49,7 @@ export function Sidebar({ pending, reviews }: { pending: number; reviews: number
     <>
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-ink lg:flex">{brand}{nav}</aside>
       <div className="sticky top-0 z-40 flex items-center justify-between bg-ink px-4 py-3 lg:hidden">
-        <Link href="/admin" className="flex items-center gap-2"><Image src="/brand/logo-mark.png" alt="" style={{ width: "auto" }} width={28} height={36} className="h-8 w-auto" /><span className="font-caps text-sm tracking-[0.2em] text-gold-2">ADMIN</span></Link>
+        <Link href="/admin" className="flex items-center gap-2"><Image src="/brand/logo-mark.png" alt="" style={{ width: "auto" }} width={28} height={33} className="h-8 w-auto" /><span className="font-caps text-sm tracking-[0.2em] text-gold-2">ADMIN</span></Link>
         <button onClick={() => setOpen(true)} className="p-1 text-cream" aria-label="Open menu"><Menu className="size-6" /></button>
       </div>
       {open && (

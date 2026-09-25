@@ -1,5 +1,7 @@
 import StoreLayout from "./(store)/layout";
-import StoreNotFound from "./(store)/not-found";
+import StoreNotFound, { metadata } from "./(store)/not-found";
+
+export { metadata };
 
 // URLs that match no route still get the full store header, footer and cart.
 export default function NotFound() {

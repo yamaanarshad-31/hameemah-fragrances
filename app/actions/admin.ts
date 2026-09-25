@@ -1,25 +1,36 @@
 "use server";
 import { z } from "zod";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { eq, inArray, like, sql } from "drizzle-orm";
-import { getDb, schema as s } from "@/lib/db";
+import { getDb, schema as s, type DB } from "@/lib/db";
 import { checkCredentials, createSession, destroySession, requireAdmin } from "@/lib/auth";
 import { slugify, STATUSES } from "@/lib/format";
 
 const refresh = () => revalidatePath("/", "layout");
 
 // ---- auth ----
+// Failed sign-ins per client IP + email. In memory, so each serverless instance keeps its own count;
+// keying on the IP stops a stranger from locking the real admin out by typing their email.
 const attempts = new Map<string, { n: number; at: number }>();
+const WINDOW = 10 * 60_000;
+
+async function clientIp() {
+  const h = await headers();
+  return h.get("x-forwarded-for")?.split(",")[0].trim() || h.get("x-real-ip")?.trim() || "";
+}
 
 export async function login(_: unknown, form: FormData) {
   const email = String(form.get("email") || "");
-  const key = email.toLowerCase();
+  const key = `${(await clientIp()) || "?"}|${email.trim().toLowerCase()}`;
+  const now = Date.now();
+  for (const [k, v] of attempts) if (now - v.at >= WINDOW) attempts.delete(k); // keep the map from growing forever
   const a = attempts.get(key);
-  if (a && a.n >= 5 && Date.now() - a.at < 10 * 60_000) return { error: "Too many attempts. Please wait 10 minutes." };
+  if (a && a.n >= 5) return { error: "Too many attempts. Please wait 10 minutes.", email };
   if (!checkCredentials(email, String(form.get("password") || ""))) {
-    attempts.set(key, { n: (a && Date.now() - a.at < 10 * 60_000 ? a.n : 0) + 1, at: Date.now() });
-    return { error: "Wrong email or password." };
+    attempts.set(key, { n: (a?.n ?? 0) + 1, at: now });
+    return { error: "Wrong email or password.", email };
   }
   attempts.delete(key);
   await createSession();
@@ -93,6 +104,19 @@ export async function toggleProduct(id: number, field: "active" | "featured" | "
 }
 
 // ---- orders ----
+/** Puts an order's stock, "sold" count and coupon use back (sign 1) or takes them again (sign -1). */
+async function restock(db: DB, o: s.Order, sign: 1 | -1) {
+  for (const it of o.items) {
+    const [p] = await db.select().from(s.products).where(eq(s.products.id, it.productId));
+    if (!p) continue;
+    await db.update(s.products).set({
+      variants: p.variants.map((v) => (v.size === it.size ? { ...v, stock: Math.max(0, v.stock + sign * it.qty) } : v)),
+      sold: Math.max(0, (p.sold ?? 0) - sign * it.qty),
+    }).where(eq(s.products.id, p.id));
+  }
+  if (o.coupon) await db.update(s.coupons).set({ uses: sql`max(0, ${s.coupons.uses} - ${sign})` }).where(eq(s.coupons.code, o.coupon));
+}
+
 export async function setOrderStatus(id: number, status: string) {
   await requireAdmin();
   if (!(STATUSES as readonly string[]).includes(status)) return;
@@ -100,18 +124,7 @@ export async function setOrderStatus(id: number, status: string) {
   const [o] = await db.select().from(s.orders).where(eq(s.orders.id, id));
   if (!o) return;
   // put stock back if an order is cancelled (and take it again if un-cancelled)
-  if ((status === "cancelled") !== (o.status === "cancelled")) {
-    const sign = status === "cancelled" ? 1 : -1;
-    for (const it of o.items) {
-      const [p] = await db.select().from(s.products).where(eq(s.products.id, it.productId));
-      if (!p) continue;
-      await db.update(s.products).set({
-        variants: p.variants.map((v) => (v.size === it.size ? { ...v, stock: Math.max(0, v.stock + sign * it.qty) } : v)),
-        sold: Math.max(0, (p.sold ?? 0) - sign * it.qty),
-      }).where(eq(s.products.id, p.id));
-    }
-    if (o.coupon) await db.update(s.coupons).set({ uses: sql`max(0, ${s.coupons.uses} - ${sign})` }).where(eq(s.coupons.code, o.coupon));
-  }
+  if ((status === "cancelled") !== (o.status === "cancelled")) await restock(db, o, status === "cancelled" ? 1 : -1);
   await db.update(s.orders).set({ status }).where(eq(s.orders.id, id));
   refresh();
 }
@@ -119,6 +132,10 @@ export async function setOrderStatus(id: number, status: string) {
 export async function deleteOrder(id: number) {
   await requireAdmin();
   const db = await getDb();
+  const [o] = await db.select().from(s.orders).where(eq(s.orders.id, id));
+  // a live order still holds stock — hand it back, just like cancelling would
+  // (demo orders never took any stock, same as "Remove demo orders")
+  if (o && o.status !== "cancelled" && !o.orderNo.startsWith("DEMO-")) await restock(db, o, 1);
   await db.delete(s.orders).where(eq(s.orders.id, id));
   refresh();
   redirect("/admin/orders");
@@ -213,7 +230,7 @@ export async function saveSettings(_: unknown, form: FormData) {
   const db = await getDb();
   const keys = ["announcement", "heroTitle", "heroSubtitle", "whatsapp", "phone", "email", "instagram", "facebook", "tiktok", "shippingFee", "freeShippingOver", "city", "bankDetails"];
   for (const key of keys) {
-    let value = String(form.get(key) ?? "").trim().slice(0, 600);
+    let value = String(form.get(key) ?? "").replace(/\r\n?/g, "\n").trim().slice(0, 600);
     if (key === "whatsapp") value = value.replace(/\D/g, "").replace(/^0/, "92");
     if (key === "shippingFee" || key === "freeShippingOver") value = String(Math.max(0, Number(value) || 0));
     await db.insert(s.settings).values({ key, value }).onConflictDoUpdate({ target: s.settings.key, set: { value } });

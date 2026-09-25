@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Cinzel, Manrope } from "next/font/google";
 import "./globals.css";
 import { BRAND, SITE_URL } from "@/lib/site";
+import { InlineScript } from "@/components/store/InlineScript";
 
 const cormorant = Cormorant_Garamond({ variable: "--font-cormorant", subsets: ["latin"], weight: ["400", "500", "600"], style: ["normal", "italic"] });
 const cinzel = Cinzel({ variable: "--font-cinzel", subsets: ["latin"], weight: ["400"] });
@@ -29,11 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-PK" suppressHydrationWarning className={`${cormorant.variable} ${cinzel.variable} ${manrope.variable} antialiased`}>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{if(sessionStorage.getItem('hf_intro')||matchMedia('(prefers-reduced-motion: reduce)').matches||/[?&]intro=skip/.test(location.search))document.documentElement.classList.add('intro-seen')}catch(e){}`,
-          }}
-        />
+        <InlineScript html={`try{if(sessionStorage.getItem('hf_intro')||matchMedia('(prefers-reduced-motion: reduce)').matches||/[?&]intro=skip/.test(location.search))document.documentElement.classList.add('intro-seen')}catch(e){}`} />
       </head>
       <body className="min-h-dvh">{children}</body>
     </html>

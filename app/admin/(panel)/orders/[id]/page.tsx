@@ -12,8 +12,10 @@ import { rs } from "@/lib/format";
 export const metadata = { title: "Order" };
 
 export default async function OrderDetail({ params }: PageProps<"/admin/orders/[id]">) {
+  const id = Number((await params).id);
+  if (!Number.isInteger(id)) notFound();
   const db = await getDb();
-  const [o] = await db.select().from(s.orders).where(eq(s.orders.id, Number((await params).id)));
+  const [o] = await db.select().from(s.orders).where(eq(s.orders.id, id));
   if (!o) notFound();
   const wa = o.phone.replace(/\D/g, "").replace(/^0/, "92");
   const msg = `Assalam o Alaikum ${o.name}! Thank you for ordering from Fragrances by Hameemah. Your order ${o.orderNo} of ${rs(o.total)} is ${o.status}.`;

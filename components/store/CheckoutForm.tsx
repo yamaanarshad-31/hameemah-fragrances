@@ -53,6 +53,12 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
     else { setCoupon(null); setCouponMsg(r.msg); }
   });
 
+  // an error goes away as soon as the shopper edits that field
+  const clearError = (name: string) => {
+    if (!errors[name]) return;
+    setErrors((x) => { const y = { ...x }; delete y[name]; return y; });
+  };
+
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -79,7 +85,7 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
     );
 
   return (
-    <form onSubmit={submit} noValidate={false} className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
+    <form onSubmit={submit} onChange={(e) => clearError((e.nativeEvent.target as HTMLInputElement).name)} noValidate={false} className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
       <div className="space-y-8">
         {errors.items && <p className="rounded-xl bg-red-50 p-4 text-red-800">{errors.items}</p>}
         <section>
@@ -134,7 +140,7 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
           <div className="mt-5 flex gap-2">
             <label className="flex flex-1 items-center gap-2 rounded-xl border border-ink/15 px-3 focus-within:border-emerald">
               <Tag className="size-4 text-muted" />
-              <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="Discount code" aria-label="Discount code" className="w-full bg-transparent py-3 text-sm uppercase focus:outline-none" />
+              <input value={code} onChange={(e) => { setCode(e.target.value.toUpperCase()); clearError("coupon"); }} placeholder="Discount code" aria-label="Discount code" className="w-full bg-transparent py-3 text-sm uppercase focus:outline-none" />
             </label>
             <button type="button" onClick={apply} disabled={!code || checking} className="rounded-xl bg-ink px-5 text-sm font-bold text-cream disabled:opacity-50">{checking ? "…" : "Apply"}</button>
           </div>

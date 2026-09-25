@@ -55,7 +55,7 @@ export function Header({ categories }: { categories: Cat[] }) {
           </button>
 
           <Link href="/" className="group flex items-center gap-3" aria-label="Fragrances by Hameemah — home">
-            <Image src="/brand/logo-mark.png" alt="" style={{ width: "auto" }} width={48} height={61} priority className="h-11 w-auto transition-transform duration-700 group-hover:rotate-[-6deg] group-hover:scale-110 lg:h-13" />
+            <Image src="/brand/logo-mark.png" alt="" style={{ width: "auto" }} width={48} height={56} priority className="h-11 w-auto transition-transform duration-700 group-hover:rotate-[-6deg] group-hover:scale-110 lg:h-13" />
             <span className="hidden flex-col leading-none sm:flex">
               <span className="font-caps text-[1.05rem] tracking-[0.22em] text-gold-shine">FRAGRANCES</span>
               <span className="mt-1 font-caps text-[0.6rem] tracking-[0.42em] text-gold-2/80">BY HAMEEMAH</span>
@@ -106,7 +106,7 @@ export function Header({ categories }: { categories: Cat[] }) {
         {menu && (
           <motion.div className="fixed inset-0 z-50 bg-ink/95 backdrop-blur-xl lg:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <div className="flex h-[76px] items-center justify-between px-4">
-              <Image src="/brand/logo-mark.png" alt="" style={{ width: "auto" }} width={40} height={51} className="h-10 w-auto" />
+              <Image src="/brand/logo-mark.png" alt="" style={{ width: "auto" }} width={40} height={47} className="h-10 w-auto" />
               <button onClick={() => setMenu(false)} className="p-2 text-gold-2" aria-label="Close menu"><X className="size-7" /></button>
             </div>
             <nav className="flex flex-col gap-1 px-8 pt-6">

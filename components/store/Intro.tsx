@@ -16,7 +16,7 @@ export function Intro() {
         <div className="intro-stage absolute inset-0 flex flex-col items-center justify-center">
           <div className="intro-glow absolute size-[36rem] rounded-full" />
           <div className="intro-mark relative">
-            <Image src="/brand/logo-mark.png" alt="" style={{ width: "auto" }} width={220} height={280} priority className="h-52 w-auto sm:h-64" />
+            <Image src="/brand/logo-mark.png" alt="" style={{ width: "auto" }} width={220} height={258} priority className="h-52 w-auto sm:h-64" />
             <span className="intro-sweep absolute inset-0" />
           </div>
           <p className="mt-6 flex font-caps text-2xl tracking-[0.35em] text-gold-2 sm:text-3xl">

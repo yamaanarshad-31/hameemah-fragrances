@@ -27,8 +27,13 @@ export function ShopControls({ cats, active, count }: { cats: { name: string; sl
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q]);
 
-  const chip = (href: string, label: string, on: boolean) => (
-    <Link key={href} href={href} scroll={false} className={`whitespace-nowrap rounded-full border px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] transition ${on ? "border-emerald bg-emerald text-cream" : "border-ink/15 text-ink/70 hover:border-emerald hover:text-emerald"}`}>
+  // switching collection keeps the search and sort the shopper already chose
+  const keep = new URLSearchParams();
+  if (q.trim()) keep.set("q", q.trim());
+  const sort = sp.get("sort");
+  if (sort) keep.set("sort", sort);
+  const chip = (path: string, label: string, on: boolean) => (
+    <Link key={path} href={`${path}${keep.size ? `?${keep}` : ""}`} scroll={false} className={`whitespace-nowrap rounded-full border px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] transition ${on ? "border-emerald bg-emerald text-cream" : "border-ink/15 text-ink/70 hover:border-emerald hover:text-emerald"}`}>
       {label}
     </Link>
   );
@@ -47,7 +52,7 @@ export function ShopControls({ cats, active, count }: { cats: { name: string; sl
           </label>
           <label className="flex min-w-0 items-center gap-2 rounded-full border border-ink/15 bg-white px-4 py-2.5 lg:w-52">
             <SlidersHorizontal className="size-4 text-muted" />
-            <select value={sp.get("sort") ?? ""} onChange={(e) => push({ sort: e.target.value })} aria-label="Sort by" className="w-full min-w-0 bg-transparent text-sm focus:outline-none">
+            <select value={sort ?? ""} onChange={(e) => push({ sort: e.target.value })} aria-label="Sort by" className="w-full min-w-0 bg-transparent text-sm focus:outline-none">
               <option value="">Newest</option>
               <option value="popular">Bestselling</option>
               <option value="price-asc">Price: low to high</option>

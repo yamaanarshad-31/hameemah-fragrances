@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Search, X } from "lucide-react";
@@ -13,6 +14,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
   const [hits, setHits] = useState<Hit[]>([]);
   const [loading, setLoading] = useState(false);
   const input = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (open) setTimeout(() => input.current?.focus(), 80);
@@ -49,6 +51,13 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
                 ref={input}
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key !== "Enter" || !q.trim()) return;
+                  e.preventDefault();
+                  router.push(`/shop?q=${encodeURIComponent(q.trim())}`);
+                  onClose();
+                }}
+                enterKeyHint="search"
                 placeholder="Search oud, rose, fresh…"
                 className="w-full bg-transparent font-display text-3xl text-cream placeholder:text-cream/30 focus:outline-none sm:text-5xl"
                 aria-label="Search perfumes"

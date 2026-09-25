@@ -8,7 +8,7 @@ import { ProductImage } from "./ProductImage";
 import { rs } from "@/lib/format";
 
 export function CartDrawer({ freeOver }: { freeOver: number }) {
-  const { open, setOpen, lines, subtotal, setQty, remove, toast } = useCart();
+  const { open, setOpen, lines, count, subtotal, setQty, remove, toast } = useCart();
   const left = Math.max(0, freeOver - subtotal);
   const pct = freeOver > 0 ? Math.min(100, (subtotal / freeOver) * 100) : 100;
 
@@ -35,7 +35,7 @@ export function CartDrawer({ freeOver }: { freeOver: number }) {
               data-lenis-prevent
             >
               <div className="flex items-center justify-between bg-forest px-6 py-5 text-cream">
-                <p className="font-display text-2xl">Your Bag <span className="text-gold">({lines.length})</span></p>
+                <p className="font-display text-2xl">Your Bag <span className="text-gold">({count})</span></p>
                 <button onClick={() => setOpen(false)} aria-label="Close bag" className="rounded-full p-1.5 hover:bg-white/10"><X className="size-6" /></button>
               </div>
 
