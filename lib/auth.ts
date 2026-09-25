@@ -3,16 +3,21 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { timingSafeEqual } from "node:crypto";
+import { adminLogin, adminSecret } from "./admin-env";
 
 export const COOKIE = "hf_admin";
-const secret = () => new TextEncoder().encode(process.env.ADMIN_SECRET || "dev-only-secret-change-me-please-32chars");
+const secret = () => {
+  const s = adminSecret();
+  if (!s) throw new Error("ADMIN_SECRET must be set (at least 32 characters)");
+  return s;
+};
 
 export function checkCredentials(email: string, password: string) {
-  const wantEmail = (process.env.ADMIN_EMAIL || "admin@hameemah.com").toLowerCase();
-  const wantPass = process.env.ADMIN_PASSWORD || "hameemah123";
+  const want = adminLogin();
+  if (!want || !adminSecret()) return false;
   const a = Buffer.from(password);
-  const b = Buffer.from(wantPass);
-  return email.trim().toLowerCase() === wantEmail && a.length === b.length && timingSafeEqual(a, b);
+  const b = Buffer.from(want.password);
+  return email.trim().toLowerCase() === want.email && a.length === b.length && timingSafeEqual(a, b);
 }
 
 export async function createSession() {
@@ -31,9 +36,10 @@ export async function createSession() {
 }
 
 export async function verifyToken(token?: string) {
-  if (!token) return false;
+  const key = adminSecret();
+  if (!token || !key) return false;
   try {
-    await jwtVerify(token, secret());
+    await jwtVerify(token, key);
     return true;
   } catch {
     return false;
