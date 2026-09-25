@@ -3,8 +3,9 @@ import { Clock, Mail, MessageCircle, Phone } from "lucide-react";
 import { PageHero } from "@/components/store/PageHero";
 import { Reveal } from "@/components/store/Reveal";
 import { getSettings } from "@/lib/data";
+import { pageMeta } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Contact Us", description: "Questions about a perfume or your order? Reach Fragrances by Hameemah on WhatsApp, phone or email.", alternates: { canonical: "/contact" } };
+export const metadata: Metadata = pageMeta({ title: "Contact Us", description: "Questions about a perfume or your order? Reach Fragrances by Hameemah on WhatsApp, phone or email — Mon–Sat, 11am to 9pm.", path: "/contact" });
 
 export default async function Contact() {
   const s = await getSettings();

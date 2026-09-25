@@ -8,20 +8,26 @@ import { ProductCard } from "@/components/store/ProductCard";
 import { Reveal } from "@/components/store/Reveal";
 import { getProduct, getProducts, getSettings } from "@/lib/data";
 import { toCard } from "@/lib/card";
-import { SITE_URL } from "@/lib/site";
+import { isSampleReview } from "@/lib/db/seed";
+import { BRAND, SITE_URL, STORE_ID, abs, clip, ld, pageMeta } from "@/lib/site";
+
+/** "Eau de Parfum" → "EDP" etc. for tighter titles. */
+const shortConc = (c: string | null) => ({ "Eau de Parfum": "EDP", "Extrait de Parfum": "Extrait", "Eau de Toilette": "EDT", "Attar (Oil)": "Attar" })[c ?? ""] ?? c ?? "";
 
 export async function generateMetadata({ params }: PageProps<"/product/[slug]">): Promise<Metadata> {
   const r = await getProduct((await params).slug);
   if (!r) return {};
   const p = r.product;
   const price = Math.min(...p.variants.map((v) => v.price));
-  return {
-    title: `${p.name} — ${p.tagline}`,
-    description: `${p.name}: ${p.description?.slice(0, 120)} From Rs. ${price.toLocaleString()} with cash on delivery across Pakistan.`,
-    alternates: { canonical: `/product/${p.slug}` },
-    openGraph: { type: "website", title: `${p.name} | Fragrances by Hameemah`, description: p.tagline ?? undefined, url: `/product/${p.slug}`, images: [p.images[0] ?? "/opengraph-image.jpg"] },
-    twitter: { card: "summary_large_image", images: [p.images[0] ?? "/opengraph-image.jpg"] },
-  };
+  const raw = p.categorySlug === "gift-sets" ? "Gift Set" : shortConc(p.concentration) || "Perfume";
+  const kind = p.name.toLowerCase().includes(raw.split(" ")[0].toLowerCase()) ? "" : raw; // avoid "White Oudh Attar Attar"
+
+  return pageMeta({
+    title: `${[p.name, kind].filter(Boolean).join(" ")} Price in Pakistan`,
+    description: clip(`${p.name} by Fragrances by Hameemah: ${p.tagline ? p.tagline.toLowerCase() + ". " : ""}${p.description ?? ""}`, 120) + ` From Rs. ${price.toLocaleString("en-PK")}, cash on delivery in Pakistan.`,
+    path: `/product/${p.slug}`,
+    images: p.images[0] ? [{ url: p.images[0], alt: `${p.name} — ${p.tagline || p.concentration}` }] : undefined,
+  });
 }
 
 function Pyramid({ top, heart, base }: { top: string; heart: string; base: string }) {
@@ -50,28 +56,79 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
   ]);
   const more = related.filter((x) => x.id !== p.id).slice(0, 4);
 
-  const prices = p.variants.map((v) => v.price);
+  // Sample reviews from the seed data are shown on the page but never marked up as real ratings.
+  const real = reviews.filter((v) => !isSampleReview(v));
+  const url = `${SITE_URL}/product/${p.slug}`;
+  const fee = Number(settings.shippingFee) || 0;
+  const freeOver = Number(settings.freeShippingOver) || 0;
+  const shipping = (price: number) => ({
+    "@type": "OfferShippingDetails",
+    shippingRate: { "@type": "MonetaryAmount", value: freeOver && price >= freeOver ? 0 : fee, currency: "PKR" },
+    shippingDestination: { "@type": "DefinedRegion", addressCountry: "PK" },
+    deliveryTime: {
+      "@type": "ShippingDeliveryTime",
+      handlingTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 1, unitCode: "DAY" },
+      transitTime: { "@type": "QuantitativeValue", minValue: 2, maxValue: 4, unitCode: "DAY" },
+    },
+  });
+  const returns = {
+    "@type": "MerchantReturnPolicy",
+    applicableCountry: "PK",
+    returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+    merchantReturnDays: 7,
+    returnMethod: "https://schema.org/ReturnByMail",
+    refundType: "https://schema.org/ExchangeRefund",
+  };
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
+    "@id": `${url}#product`,
     name: p.name,
-    description: p.description,
+    description: p.description || p.tagline,
     sku: `HF-${p.id}`,
-    brand: { "@type": "Brand", name: "Fragrances by Hameemah" },
-    image: p.images.length ? p.images.map((i) => (i.startsWith("http") ? i : SITE_URL + i)) : [`${SITE_URL}/brand/logo-full.png`],
-    url: `${SITE_URL}/product/${p.slug}`,
-    offers: {
-      "@type": "AggregateOffer",
+    brand: { "@type": "Brand", name: BRAND },
+    ...(p.categoryName ? { category: `Perfume > ${p.categoryName}` } : {}),
+    image: p.images.length ? p.images.map(abs) : [`${SITE_URL}/brand/logo-full.png`],
+    url,
+    additionalProperty: [
+      { "@type": "PropertyValue", name: "Concentration", value: p.concentration },
+      ...(p.topNotes && p.categorySlug !== "gift-sets"
+        ? [
+            { "@type": "PropertyValue", name: "Top notes", value: p.topNotes },
+            { "@type": "PropertyValue", name: "Heart notes", value: p.heartNotes },
+            { "@type": "PropertyValue", name: "Base notes", value: p.baseNotes },
+          ]
+        : []),
+    ],
+    offers: p.variants.map((v) => ({
+      "@type": "Offer",
+      name: `${p.name} ${v.size}`,
+      sku: `HF-${p.id}-${v.size.replace(/\W+/g, "")}`,
+      url,
+      price: v.price,
       priceCurrency: "PKR",
-      lowPrice: Math.min(...prices),
-      highPrice: Math.max(...prices),
-      offerCount: p.variants.length,
-      availability: p.variants.some((v) => v.stock > 0) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-    },
-    ...(p.reviewCount
+      availability: v.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/NewCondition",
+      seller: { "@id": STORE_ID },
+      shippingDetails: shipping(v.price),
+      hasMerchantReturnPolicy: returns,
+    })),
+    ...(real.length
       ? {
-          aggregateRating: { "@type": "AggregateRating", ratingValue: p.rating.toFixed(1), reviewCount: p.reviewCount },
-          review: reviews.slice(0, 5).map((v) => ({ "@type": "Review", author: { "@type": "Person", name: v.name }, reviewRating: { "@type": "Rating", ratingValue: v.rating }, reviewBody: v.body })),
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: (real.reduce((n, v) => n + v.rating, 0) / real.length).toFixed(1),
+            reviewCount: real.length,
+            bestRating: 5,
+            worstRating: 1,
+          },
+          review: real.slice(0, 5).map((v) => ({
+            "@type": "Review",
+            author: { "@type": "Person", name: v.name },
+            datePublished: new Date(v.createdAt).toISOString().slice(0, 10),
+            reviewRating: { "@type": "Rating", ratingValue: v.rating, bestRating: 5, worstRating: 1 },
+            reviewBody: v.body,
+          })),
         }
       : {}),
   };
@@ -81,13 +138,13 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
       ...(p.categorySlug ? [{ "@type": "ListItem", position: 2, name: p.categoryName, item: `${SITE_URL}/collections/${p.categorySlug}` }] : []),
-      { "@type": "ListItem", position: p.categorySlug ? 3 : 2, name: p.name, item: `${SITE_URL}/product/${p.slug}` },
+      { "@type": "ListItem", position: p.categorySlug ? 3 : 2, name: p.name, item: url },
     ],
   };
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLd, crumbs]).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={ld([jsonLd, crumbs])} />
       <div className="mx-auto max-w-7xl px-5 pt-8 lg:px-8">
         <nav aria-label="Breadcrumb" className="mb-8 text-xs uppercase tracking-[0.16em] text-muted">
           <Link href="/" className="hover:text-emerald">Home</Link>

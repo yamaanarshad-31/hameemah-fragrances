@@ -12,7 +12,14 @@ const nextConfig: NextConfig = {
   images: { formats: ["image/avif", "image/webp"] },
   poweredByHeader: false,
   async headers() {
-    return [{ source: "/:path*", headers: security }];
+    const noindex = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
+    return [
+      { source: "/:path*", headers: security },
+      // Belt and braces for private areas: keeps them out of search even if a link to them leaks.
+      { source: "/admin/:path*", headers: noindex },
+      { source: "/admin", headers: noindex },
+      { source: "/api/:path((?!img/).*)", headers: noindex },
+    ];
   },
 };
 

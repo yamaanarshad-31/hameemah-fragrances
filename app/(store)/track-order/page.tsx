@@ -4,8 +4,15 @@ import { PageHero } from "@/components/store/PageHero";
 import { OrderTimeline } from "@/components/store/OrderTimeline";
 import { getOrderPublic } from "@/lib/data";
 import { rs } from "@/lib/format";
+import { pageMeta } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Track Your Order", description: "Check the delivery status of your Fragrances by Hameemah order.", alternates: { canonical: "/track-order" } };
+const meta = pageMeta({ title: "Track Your Order", description: "Check the delivery status of your Fragrances by Hameemah order with your order number and mobile number.", path: "/track-order" });
+
+// A looked-up order (?no=&phone=) is personal: never index it.
+export async function generateMetadata({ searchParams }: PageProps<"/track-order">): Promise<Metadata> {
+  const sp = await searchParams;
+  return sp.no || sp.phone ? { ...meta, robots: { index: false, follow: false } } : meta;
+}
 
 export default async function Track({ searchParams }: PageProps<"/track-order">) {
   const sp = await searchParams;

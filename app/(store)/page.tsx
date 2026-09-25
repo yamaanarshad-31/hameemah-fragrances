@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Hero } from "@/components/home/Hero";
 import { Categories, GiftBand, ReviewWall, WhyUs, WordMarquee } from "@/components/home/Sections";
 import { ProductTabs } from "@/components/home/ProductTabs";
@@ -7,7 +8,16 @@ import { Faq } from "@/components/home/Faq";
 import { getCategories, getProducts, getRecentReviews, getSettings } from "@/lib/data";
 import { toCard } from "@/lib/card";
 import { FAQS } from "@/lib/faqs";
-import { SITE_URL } from "@/lib/site";
+import { BRAND, ld, pageMeta } from "@/lib/site";
+
+export const metadata: Metadata = {
+  ...pageMeta({
+    title: "Luxury Perfumes in Pakistan",
+    description: "Shop long-lasting luxury perfumes, oud and attars from Fragrances by Hameemah. Perfumes for men and women with cash on delivery and fast shipping all over Pakistan.",
+    path: "/",
+  }),
+  title: { absolute: `${BRAND} | Long-Lasting Luxury Perfumes in Pakistan` },
+};
 
 export default async function Home() {
   const [settings, cats, all, reviews] = await Promise.all([getSettings(), getCategories(), getProducts({ sort: "popular" }), getRecentReviews(10)]);
@@ -30,23 +40,12 @@ export default async function Home() {
   const finder = all.map((p) => ({ ...toCard(p), categorySlug: p.categorySlug, notes: `${p.topNotes} ${p.heartNotes} ${p.baseNotes}`, longevity: p.longevity, sillage: p.sillage }));
   const freeOver = Number(settings.freeShippingOver) || 0;
 
-  const jsonLd = [
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      name: "Fragrances by Hameemah",
-      url: SITE_URL,
-      logo: `${SITE_URL}/brand/logo-full.png`,
-      sameAs: [settings.instagram, settings.facebook, settings.tiktok].filter((u) => u && !/\.com\/?$/.test(u)),
-      contactPoint: { "@type": "ContactPoint", telephone: settings.phone, contactType: "customer service", areaServed: "PK" },
-    },
-    { "@context": "https://schema.org", "@type": "WebSite", name: "Fragrances by Hameemah", url: SITE_URL, potentialAction: { "@type": "SearchAction", target: `${SITE_URL}/shop?q={search_term_string}`, "query-input": "required name=search_term_string" } },
-    { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: FAQS.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
-  ];
+  // Store + WebSite markup lives in the store layout; the FAQ is specific to this page.
+  const jsonLd = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: FAQS.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) };
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={ld(jsonLd)} />
       <Hero items={heroItems} title={settings.heroTitle} subtitle={settings.heroSubtitle} freeOver={freeOver} />
       <WordMarquee />
       <Categories cats={cats} sample={sample} />

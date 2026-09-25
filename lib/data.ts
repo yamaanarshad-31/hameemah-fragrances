@@ -105,3 +105,14 @@ export async function getOrderPublic(orderNo: string, phone?: string) {
   if (phone !== undefined && o.phone.replace(/\D/g, "").slice(-10) !== phone.replace(/\D/g, "").slice(-10)) return null;
   return o;
 }
+
+/** Newest approved review per product — a new review changes the page, so it counts as an update. */
+export async function getLatestReviewDates() {
+  const db = await getDb();
+  const rows = await db
+    .select({ productId: s.reviews.productId, at: sql<number>`max(${s.reviews.createdAt})` })
+    .from(s.reviews)
+    .where(eq(s.reviews.approved, true))
+    .groupBy(s.reviews.productId);
+  return new Map(rows.map((r) => [r.productId, Number(r.at)]));
+}

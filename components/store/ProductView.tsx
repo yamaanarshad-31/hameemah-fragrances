@@ -69,7 +69,7 @@ export function ProductView({ p, whatsapp }: { p: P; whatsapp: string }) {
           <div className="absolute inset-[12%] animate-spin-slow rounded-full border border-dashed border-gold/20" />
           <AnimatePresence mode="wait" initial={false}>
             <motion.div key={img} initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.04 }} transition={{ duration: 0.45 }} className="absolute inset-0">
-              <div className="absolute inset-0 animate-float"><ProductImage src={gallery[img]} color={p.color} shape={p.shape} name={p.name} priority sizes="(max-width:1024px) 100vw, 50vw" /></div>
+              <div className="absolute inset-0 animate-float"><ProductImage src={gallery[img]} color={p.color} shape={p.shape} name={p.name} alt={`${p.name} – ${p.concentration ?? "perfume"} by Fragrances by Hameemah`} priority sizes="(max-width:1024px) 100vw, 50vw" /></div>
             </motion.div>
           </AnimatePresence>
           {off > 0 && <span className="absolute left-5 top-5 rounded-full bg-gold-grad px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-ink">Save {off}%</span>}

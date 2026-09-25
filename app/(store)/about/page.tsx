@@ -3,12 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { PageHero } from "@/components/store/PageHero";
 import { Reveal, SplitHeading } from "@/components/store/Reveal";
+import { pageMeta } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Our Story",
   description: "Fragrances by Hameemah blends long-lasting, luxury perfumes and attars for Pakistan — made in small batches with premium oils.",
-  alternates: { canonical: "/about" },
-};
+  path: "/about",
+});
 
 export default function About() {
   const values = [

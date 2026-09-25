@@ -97,6 +97,9 @@ const REVIEWS = [
   ["ocean-crown", "Ali N.", "Peshawar", 4, "Clean and fresh, great for summer."],
 ] as const;
 
+/** True for the demo reviews above, so they are never presented to search engines as real ratings. */
+export const isSampleReview = (r: { name: string; body: string }) => REVIEWS.some(([, name, , , body]) => name === r.name && body === r.body);
+
 export async function seed(db: LibSQLDatabase<typeof s>) {
   const existing = await db.select({ n: sql<number>`count(*)` }).from(s.categories);
   if (existing[0].n > 0) return;

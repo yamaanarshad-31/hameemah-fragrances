@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/store/PageHero";
 import { getSettings } from "@/lib/data";
+import { pageMeta } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Shipping, Returns & Privacy", description: "Delivery times, charges, exchange policy and privacy information for Fragrances by Hameemah.", alternates: { canonical: "/policies" } };
+export const metadata: Metadata = pageMeta({ title: "Shipping, Returns & Privacy", description: "Delivery in 2–4 working days all over Pakistan, cash on delivery, 7-day exchange on sealed bottles and our privacy policy.", path: "/policies" });
 
 export default async function Policies() {
   const s = await getSettings();
