@@ -1,5 +1,11 @@
-// Renders two studio-style product photos per perfume from the drawn bottle
-// and stores them as the product's images. Run: npx tsx scripts/product-photos.tsx
+// ⚠️  DO NOT RUN — THIS WOULD OVERWRITE THE SHOP'S REAL BOTTLE PHOTOS.
+//
+// Old tool, kept for reference only. It renders two computer-generated "studio" photos per
+// perfume from the drawn bottle, DELETES every product's current photos (including real,
+// uploaded ones) and replaces them with the renders. Since September 2026 the products use
+// real photos of the shop's bottles (public/photos, scripts/catalog-update-2026-09.ts).
+// Nothing runs this automatically, and it refuses to start unless you set
+// OVERWRITE_REAL_PHOTOS=yes on purpose.
 import { renderToStaticMarkup } from "react-dom/server";
 import sharp from "sharp";
 import { randomUUID } from "node:crypto";
@@ -63,6 +69,10 @@ function scene(color: string, shape: number, name: string, id: number, light: bo
 }
 
 async function main() {
+if (process.env.OVERWRITE_REAL_PHOTOS !== "yes") {
+  console.error("Refusing to run: this replaces every product photo, including the real ones. See the note at the top of this file.");
+  process.exit(1);
+}
 const { rows } = await db.execute("select id, name, slug, color, shape, images from products");
 for (const p of rows) {
   const color = String(p.color || "#b8860b");

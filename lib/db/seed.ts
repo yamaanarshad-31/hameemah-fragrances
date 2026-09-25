@@ -18,77 +18,66 @@ export const DEFAULT_SETTINGS: Record<string, string> = {
   bankDetails: "Bank: (add your bank name)\nAccount title: Fragrances by Hameemah\nAccount / IBAN: (add in Admin → Settings)\nJazzCash / Easypaisa: 0300 1234567",
 };
 
-const v = (a: number, b: number, c: number, sale = 0): s.Variant[] => [
-  { size: "30ml", price: a, compareAt: sale ? Math.round(a * 1.25 / 10) * 10 : null, stock: 40 },
+// Every perfume comes in 50ml and 100ml.
+const v = (b: number, c: number, sale = 0): s.Variant[] => [
   { size: "50ml", price: b, compareAt: sale ? Math.round(b * 1.25 / 10) * 10 : null, stock: 35 },
   { size: "100ml", price: c, compareAt: sale ? Math.round(c * 1.25 / 10) * 10 : null, stock: 20 },
 ];
 
 type SeedProduct = Omit<typeof s.products.$inferInsert, "createdAt" | "images" | "categoryId"> & { cat: string };
 
+// Real photos of the shop's bottles (public/photos). The blue bottle goes with the fresh,
+// blue scents; the clear one with the rest. The group shot is every product's second photo.
+const PHOTO = { clear: "/photos/bottle-clear.webp", blue: "/photos/bottle-blue.webp", group: "/photos/bottles-group.webp" };
+export const BLUE_BOTTLE = new Set(["ocean-crown", "citrus-couture", "emerald-noir"]);
+export const photosFor = (slug: string) => [BLUE_BOTTLE.has(slug) ? PHOTO.blue : PHOTO.clear, PHOTO.group];
+
 const PRODUCTS: SeedProduct[] = [
-  { name: "Oud Al Hameem", slug: "oud-al-hameem", cat: "oud-attar", tagline: "Smoky royal oud with a rose heart", concentration: "Extrait de Parfum",
-    description: "Our signature. Dark agarwood smoulders beneath Taifi rose and saffron, settling into a warm amber trail that lingers from morning until night.",
-    topNotes: "Saffron, Pink Pepper", heartNotes: "Taifi Rose, Agarwood", baseNotes: "Amber, Patchouli, Musk", longevity: 5, sillage: 5,
-    variants: v(2990, 4290, 6990, 1), color: "#5a2d0c", shape: 0, featured: true, bestseller: true, sold: 184 },
   { name: "Emerald Noir", slug: "emerald-noir", cat: "men", tagline: "Fresh green vetiver, dark and magnetic",
     description: "A crisp opening of bergamot and green apple gives way to vetiver and cedar. Confident, clean and made for evenings out.",
     topNotes: "Bergamot, Green Apple", heartNotes: "Vetiver, Lavender", baseNotes: "Cedarwood, Tonka", longevity: 4, sillage: 4,
-    variants: v(2490, 3590, 5490), color: "#0f5132", shape: 1, featured: true, bestseller: true, sold: 142 },
+    variants: v(3590, 5490), color: "#0f5132", shape: 1, featured: true, bestseller: true, sold: 142 },
   { name: "Rose Sultana", slug: "rose-sultana", cat: "women", tagline: "A velvet bouquet of Damask rose",
     description: "Lush Damask rose and lychee wrapped in soft vanilla and white musk. Romantic, graceful and quietly unforgettable.",
     topNotes: "Lychee, Mandarin", heartNotes: "Damask Rose, Peony", baseNotes: "Vanilla, White Musk", longevity: 4, sillage: 3,
-    variants: v(2490, 3590, 5490, 1), color: "#b0415b", shape: 2, featured: true, bestseller: true, sold: 163, isNew: true },
+    variants: v(3590, 5490, 1), color: "#b0415b", shape: 2, featured: true, bestseller: true, sold: 163, isNew: true },
   { name: "Amber Majesty", slug: "amber-majesty", cat: "unisex", tagline: "Golden amber and honeyed spice",
     description: "Warm and glowing — cinnamon and honey melt into labdanum amber and sandalwood. A cosy, regal scent for cooler nights.",
     topNotes: "Cinnamon, Orange Zest", heartNotes: "Honey, Labdanum", baseNotes: "Amber, Sandalwood", longevity: 5, sillage: 4,
-    variants: v(2790, 3890, 5990), color: "#c47a12", shape: 3, bestseller: true, sold: 121 },
+    variants: v(3890, 5990), color: "#c47a12", shape: 3, bestseller: true, sold: 121 },
   { name: "Velvet Musk", slug: "velvet-musk", cat: "women", tagline: "Clean skin-musk you can't stop smelling",
     description: "Soft, powdery and intimate. Iris and cotton flower rest on a bed of creamy white musks — your skin, but better.",
     topNotes: "Pear, Aldehydes", heartNotes: "Iris, Cotton Flower", baseNotes: "White Musk, Cashmeran", longevity: 4, sillage: 2,
-    variants: v(2290, 3290, 4990), color: "#e8c7c1", shape: 1, isNew: true, sold: 77 },
-  { name: "Saffron Royale", slug: "saffron-royale", cat: "unisex", tagline: "Saffron, leather and a whisper of oud",
-    description: "Opulent and addictive. Saffron threads meet supple leather and jasmine, finishing on a smooth woody oud base.",
-    topNotes: "Saffron, Cardamom", heartNotes: "Jasmine, Leather", baseNotes: "Oud, Ambergris", longevity: 5, sillage: 5,
-    variants: v(2990, 4290, 6990, 1), color: "#8a1f11", shape: 0, featured: true, bestseller: true, sold: 139 },
+    variants: v(3290, 4990), color: "#e8c7c1", shape: 1, isNew: true, sold: 77 },
+  { name: "Saffron Royale", slug: "saffron-royale", cat: "unisex", tagline: "Saffron, leather and smooth sandalwood",
+    description: "Opulent and addictive. Saffron threads meet supple leather and jasmine, finishing on a smooth base of sandalwood and ambergris.",
+    topNotes: "Saffron, Cardamom", heartNotes: "Jasmine, Leather", baseNotes: "Sandalwood, Ambergris", longevity: 5, sillage: 5,
+    variants: v(4290, 6990, 1), color: "#8a1f11", shape: 0, featured: true, bestseller: true, sold: 139 },
   { name: "Citrus Couture", slug: "citrus-couture", cat: "men", tagline: "Sparkling citrus for hot summer days",
     description: "An energising splash of Sicilian lemon, grapefruit and sea salt over light woods. Your everyday fresh favourite.",
     topNotes: "Lemon, Grapefruit", heartNotes: "Sea Salt, Neroli", baseNotes: "Driftwood, Musk", longevity: 3, sillage: 3,
-    variants: v(1990, 2890, 4490), color: "#d9b43a", shape: 2, isNew: true, sold: 64 },
+    variants: v(2890, 4490), color: "#d9b43a", shape: 2, isNew: true, sold: 64 },
   { name: "Midnight Jasmine", slug: "midnight-jasmine", cat: "women", tagline: "Night-blooming jasmine and tuberose",
     description: "Heady white florals that come alive after dark — jasmine sambac and tuberose over a smooth benzoin glow.",
     topNotes: "Blackcurrant, Bergamot", heartNotes: "Jasmine Sambac, Tuberose", baseNotes: "Benzoin, Vanilla", longevity: 4, sillage: 4,
-    variants: v(2490, 3590, 5490), color: "#3b2a5c", shape: 3, featured: true, sold: 98 },
+    variants: v(3590, 5490), color: "#3b2a5c", shape: 3, featured: true, sold: 98 },
   { name: "Ocean Crown", slug: "ocean-crown", cat: "men", tagline: "Aquatic, airy and effortlessly cool",
     description: "Marine accords and mint over ambroxan — the scent of an open sea breeze. Clean, modern and office-friendly.",
     topNotes: "Mint, Marine Accord", heartNotes: "Geranium, Sage", baseNotes: "Ambroxan, Cedar", longevity: 4, sillage: 3,
-    variants: v(2290, 3290, 4990), color: "#1d5f8a", shape: 1, bestseller: true, sold: 117 },
+    variants: v(3290, 4990), color: "#1d5f8a", shape: 1, bestseller: true, sold: 117 },
   { name: "Leather & Smoke", slug: "leather-and-smoke", cat: "men", tagline: "Bold smoky leather with birch tar",
     description: "For those who like to be noticed. Smoky birch, black pepper and rich leather over a dry, woody base.",
     topNotes: "Black Pepper, Juniper", heartNotes: "Leather, Birch Tar", baseNotes: "Vetiver, Oakmoss", longevity: 5, sillage: 4,
-    variants: v(2790, 3890, 5990), color: "#2b1d14", shape: 0, isNew: true, sold: 58 },
-  { name: "White Oudh Attar", slug: "white-oudh-attar", cat: "oud-attar", tagline: "Alcohol-free concentrated attar", concentration: "Attar (Oil)",
-    description: "A soft, milky white oud in pure oil form — a few drops last all day. Gentle on skin and perfect for daily wear.",
-    topNotes: "Bergamot", heartNotes: "White Oud, Rose", baseNotes: "Sandalwood, Musk", longevity: 5, sillage: 3,
-    variants: [{ size: "6ml", price: 1490, compareAt: null, stock: 50 }, { size: "12ml", price: 2490, compareAt: 2990, stock: 30 }],
-    color: "#e9dcc0", shape: 2, sold: 71 },
-  { name: "The Signature Gift Box", slug: "signature-gift-box", cat: "gift-sets", tagline: "Four 10ml bestsellers in a luxury box", concentration: "Gift Set",
-    description: "Oud Al Hameem, Emerald Noir, Rose Sultana and Saffron Royale in 10ml travel sprays, presented in our green-and-gold keepsake box.",
-    topNotes: "Assorted", heartNotes: "Assorted", baseNotes: "Assorted", longevity: 5, sillage: 4,
-    variants: [{ size: "4 × 10ml", price: 3490, compareAt: 4490, stock: 25 }], color: "#0f3d2a", shape: 3, featured: true, sold: 88 },
+    variants: v(3890, 5990), color: "#2b1d14", shape: 0, isNew: true, sold: 58 },
 ];
 
 const CATS = [
   { name: "For Him", slug: "men", blurb: "Bold, fresh & woody", color: "#0f3d2a", sort: 1 },
   { name: "For Her", slug: "women", blurb: "Floral, soft & radiant", color: "#6b2138", sort: 2 },
   { name: "Unisex", slug: "unisex", blurb: "Made to be shared", color: "#6b4a12", sort: 3 },
-  { name: "Oud & Attar", slug: "oud-attar", blurb: "Deep eastern classics", color: "#3a1d0c", sort: 4 },
-  { name: "Gift Sets", slug: "gift-sets", blurb: "Ready to impress", color: "#1b2f4a", sort: 5 },
 ];
 
 const REVIEWS = [
-  ["oud-al-hameem", "Ayesha K.", "Lahore", 5, "Lasted the whole wedding day and people kept asking what I was wearing. Packaging is gorgeous."],
-  ["oud-al-hameem", "Bilal R.", "Karachi", 5, "Proper rich oud without being harsh. Worth every rupee."],
   ["emerald-noir", "Hamza S.", "Islamabad", 5, "My new daily. Fresh in the morning and still there at night."],
   ["emerald-noir", "Usman T.", "Multan", 4, "Very classy scent. Wish the 100ml was a bit cheaper, but quality is top."],
   ["rose-sultana", "Mahnoor A.", "Karachi", 5, "The softest, most beautiful rose. Delivered in 2 days with a sweet note inside."],
@@ -110,7 +99,7 @@ export async function seed(db: LibSQLDatabase<typeof s>) {
   const catId = (slug: string) => cats.find((c) => c.slug === slug)?.id ?? null;
 
   await db.insert(s.products).values(
-    PRODUCTS.map(({ cat, ...p }, i) => ({ ...p, categoryId: catId(cat), images: [], createdAt: now - i * 86400000 })),
+    PRODUCTS.map(({ cat, ...p }, i) => ({ ...p, categoryId: catId(cat), images: photosFor(p.slug), createdAt: now - i * 86400000 })),
   ).onConflictDoNothing();
   const prods = await db.select({ id: s.products.id, slug: s.products.slug }).from(s.products);
   const pid = (slug: string) => prods.find((p) => p.slug === slug)!.id;

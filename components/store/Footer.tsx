@@ -26,7 +26,7 @@ export function Footer({ settings, categories }: { settings: Settings; categorie
         <div className="grid gap-12 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
             <Image src="/brand/logo-full.png" alt="Fragrances by Hameemah" width={160} height={176} className="h-36 w-auto" />
-            <p className="mt-5 max-w-xs text-sm leading-relaxed text-cream/60">Luxury, long-lasting perfumes and attars — blended with love and delivered across Pakistan.</p>
+            <p className="mt-5 max-w-xs text-sm leading-relaxed text-cream/60">Luxury, long-lasting perfumes — blended with love and delivered across Pakistan.</p>
             <div className="mt-6 flex gap-3">
               <Social href={settings.instagram} label="Instagram" d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 3.9 3.9 2.4 7.2 2.3 8.4 2.2 8.8 2.2 12 2.2zM12 7a5 5 0 100 10 5 5 0 000-10zm0 8.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4zm5.2-9.6a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z" />
               <Social href={settings.facebook} label="Facebook" d="M14 8.5V6.8c0-.8.2-1.3 1.4-1.3H17V2.2C16.7 2.2 15.6 2 14.3 2 11.6 2 10 3.6 10 6.6v1.9H7v3.6h3V22h4v-9.9h3l.5-3.6H14z" />

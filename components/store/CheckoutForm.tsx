@@ -98,7 +98,7 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
             <datalist id="cities">{CITIES.map((c) => <option key={c} value={c} />)}</datalist>
             <div className="sm:col-span-2"><Field label="Full address" name="address" autoComplete="street-address" placeholder="House #, street, area" required error={errors.address} /></div>
             <label className="block sm:col-span-2">
-              <span className="text-xs font-bold uppercase tracking-[0.14em] text-ink/70">Order note / gift message (optional)</span>
+              <span className="text-xs font-bold uppercase tracking-[0.14em] text-ink/70">Order note (optional)</span>
               <textarea name="note" rows={2} maxLength={300} className="mt-1.5 w-full rounded-xl border border-ink/15 bg-white px-4 py-3 focus:border-emerald focus:outline-none" />
             </label>
           </div>

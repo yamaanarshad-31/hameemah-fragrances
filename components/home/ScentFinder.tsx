@@ -16,7 +16,7 @@ const MOOD: Record<string, string[]> = {
   fresh: ["bergamot", "lemon", "grapefruit", "marine", "mint", "sea", "apple", "vetiver", "neroli", "sage"],
   floral: ["rose", "jasmine", "peony", "iris", "tuberose", "lychee", "cotton", "musk"],
   warm: ["amber", "vanilla", "honey", "cinnamon", "tonka", "benzoin", "sandalwood", "saffron"],
-  smoky: ["oud", "leather", "birch", "smoke", "patchouli", "agarwood", "pepper", "oakmoss"],
+  smoky: ["leather", "birch", "smoke", "patchouli", "cedar", "pepper", "oakmoss"],
 };
 
 export function ScentFinder({ products }: { products: P[] }) {
@@ -31,14 +31,13 @@ export function ScentFinder({ products }: { products: P[] }) {
       .map((p) => {
         let s = 0;
         const cat = p.categorySlug;
-        if (who === "men") s += cat === "men" ? 4 : cat === "unisex" || cat === "oud-attar" ? 2 : cat === "women" ? -5 : 0;
-        if (who === "women") s += cat === "women" ? 4 : cat === "unisex" || cat === "oud-attar" ? 2 : cat === "men" ? -5 : 0;
+        if (who === "men") s += cat === "men" ? 4 : cat === "unisex" ? 2 : cat === "women" ? -5 : 0;
+        if (who === "women") s += cat === "women" ? 4 : cat === "unisex" ? 2 : cat === "men" ? -5 : 0;
         const n = p.notes.toLowerCase();
         s += (MOOD[mood] || []).filter((w) => n.includes(w)).length * 2;
         if (when === "day") s += (p.sillage ?? 3) <= 3 ? 2 : 0;
         if (when === "night") s += (p.sillage ?? 3) >= 4 ? 2 : 0;
         if (when === "event") s += (p.longevity ?? 3) >= 5 ? 3 : 0;
-        if (cat === "gift-sets") s -= 3;
         return { p, s };
       })
       .sort((a, b) => b.s - a.s)

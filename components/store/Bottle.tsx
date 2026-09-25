@@ -16,38 +16,35 @@ function labelLines(name: string) {
 }
 
 /**
- * Hand-drawn perfume bottle used whenever a product has no uploaded photo.
- * `color` is the juice colour, `shape` picks one of four silhouettes.
+ * Hand-drawn perfume bottle used whenever a product has no uploaded photo. It follows the
+ * shop's real bottle: octagonal glass (a rectangle with cut corners), a flared gold collar
+ * and a faceted crystal cap.
+ * `color` is the juice colour; `shape` picks one of four variants — standard or wide body,
+ * each with the diamond-cut cap or the square crystal cap.
  */
 export function Bottle({ color = "#b8860b", shape = 0, name, className }: { color?: string | null; shape?: number | null; name?: string; className?: string }) {
   const id = useId().replace(/:/g, "");
   const c = color || "#b8860b";
   const k = ((shape ?? 0) % 4 + 4) % 4;
+  const wide = k >= 2;
+  const squareCap = k % 2 === 1;
 
-  const body = [
-    // 0 faceted square flacon
-    "M40 118 L52 104 H148 L160 118 V262 L148 276 H52 L40 262 Z",
-    // 1 tall slim rectangle
-    "M58 96 Q58 88 66 88 H134 Q142 88 142 96 V270 Q142 280 132 280 H68 Q58 280 58 270 Z",
-    // 2 round flacon
-    "M100 104 C150 104 172 150 172 192 C172 244 140 280 100 280 C60 280 28 244 28 192 C28 150 50 104 100 104 Z",
-    // 3 arched wide
-    "M34 150 Q34 104 100 104 Q166 104 166 150 V266 Q166 280 152 280 H48 Q34 280 34 266 Z",
-  ][k];
-  const liquidTop = [132, 118, 150, 142][k];
-  const neckY = [88, 72, 88, 88][k];
+  // octagonal body
+  const L = wide ? 30 : 40, R = 200 - L, T = 118, B = 280, ch = wide ? 16 : 14;
+  const body = `M${L + ch} ${T} H${R - ch} L${R} ${T + ch} V${B - ch} L${R - ch} ${B} H${L + ch} L${L} ${B - ch} V${T + ch} Z`;
+  const liquidTop = 138;
 
   return (
     <svg viewBox="0 0 200 300" className={className} role="img" aria-label={name ? `${name} perfume bottle` : "Perfume bottle"}>
       <defs>
         <linearGradient id={`gl${id}`} x1="0" x2="1">
           <stop offset="0" stopColor="#ffffff" stopOpacity=".55" />
-          <stop offset=".18" stopColor="#ffffff" stopOpacity=".08" />
-          <stop offset=".8" stopColor="#ffffff" stopOpacity=".04" />
-          <stop offset="1" stopColor="#ffffff" stopOpacity=".35" />
+          <stop offset=".12" stopColor="#ffffff" stopOpacity=".1" />
+          <stop offset=".85" stopColor="#ffffff" stopOpacity=".04" />
+          <stop offset="1" stopColor="#ffffff" stopOpacity=".4" />
         </linearGradient>
         <linearGradient id={`lq${id}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={c} stopOpacity=".75" />
+          <stop offset="0" stopColor={c} stopOpacity=".7" />
           <stop offset="1" stopColor={c} stopOpacity="1" />
         </linearGradient>
         <linearGradient id={`au${id}`} x1="0" x2="1">
@@ -57,6 +54,11 @@ export function Bottle({ color = "#b8860b", shape = 0, name, className }: { colo
           <stop offset=".8" stopColor="#fff1b8" />
           <stop offset="1" stopColor="#8a6a14" />
         </linearGradient>
+        <linearGradient id={`cr${id}`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ffffff" stopOpacity=".75" />
+          <stop offset=".45" stopColor="#fff6dc" stopOpacity=".3" />
+          <stop offset="1" stopColor="#ffffff" stopOpacity=".55" />
+        </linearGradient>
         <clipPath id={`cl${id}`}><path d={body} /></clipPath>
         <radialGradient id={`sh${id}`} cx=".5" cy=".5" r=".5">
           <stop offset="0" stopColor="#000" stopOpacity=".35" />
@@ -64,19 +66,25 @@ export function Bottle({ color = "#b8860b", shape = 0, name, className }: { colo
         </radialGradient>
       </defs>
 
-      <ellipse cx="100" cy="288" rx="78" ry="9" fill={`url(#sh${id})`} />
+      <ellipse cx="100" cy="288" rx="80" ry="9" fill={`url(#sh${id})`} />
 
       {/* glass */}
-      <path d={body} fill="#ffffff" fillOpacity=".16" stroke="#ffffff" strokeOpacity=".5" strokeWidth="1.5" />
+      <path d={body} fill="#ffffff" fillOpacity=".16" stroke="#ffffff" strokeOpacity=".55" strokeWidth="1.5" strokeLinejoin="round" />
       <g clipPath={`url(#cl${id})`}>
         <rect x="0" y={liquidTop} width="200" height="200" fill={`url(#lq${id})`} />
         <path d={`M0 ${liquidTop} Q50 ${liquidTop - 5} 100 ${liquidTop} T200 ${liquidTop}`} fill="#fff" fillOpacity=".25" />
         <rect x="0" y="0" width="200" height="300" fill={`url(#gl${id})`} />
-        <rect x={k === 1 ? 70 : 52} y="110" width="7" height="160" rx="3.5" fill="#fff" fillOpacity=".35" />
+        <rect x={L + 7} y={T + 12} width="6" height={B - T - 26} rx="3" fill="#fff" fillOpacity=".35" />
       </g>
+      {/* the thick glass shows an inner rounded panel, like the real bottle */}
+      <rect x={L + 16} y={T + 22} width={R - L - 32} height={B - T - 42} rx="8" fill="none" stroke="#ffffff" strokeOpacity=".35" strokeWidth="1.2" />
+      {/* cut-corner facets */}
+      <path d={`M${L} ${T + ch} L${L + 16} ${T + 22} M${R} ${T + ch} L${R - 16} ${T + 22} M${L} ${B - ch} L${L + 16} ${B - 20} M${R} ${B - ch} L${R - 16} ${B - 20}`} stroke="#ffffff" strokeOpacity=".35" strokeWidth="1" />
+      {/* dip tube */}
+      <path d={`M100 ${T} V${B - 26}`} stroke="#ffffff" strokeOpacity=".3" strokeWidth="2" />
 
       {/* label */}
-      <g transform={`translate(100 ${k === 2 ? 204 : 200})`}>
+      <g transform="translate(100 200)">
         <rect x="-38" y="-30" width="76" height="60" rx="3" fill="#06140d" fillOpacity=".82" stroke={`url(#au${id})`} strokeWidth="1.4" />
         <text y={name && name.length > 13 ? 0 : 4} textAnchor="middle" fontFamily="Georgia, serif" fontSize="26" fill={`url(#au${id})`}>H</text>
         {labelLines(name || "Hameemah").map((line, i, all) => (
@@ -86,18 +94,26 @@ export function Bottle({ color = "#b8860b", shape = 0, name, className }: { colo
         ))}
       </g>
 
-      {/* neck + cap */}
-      <rect x="84" y={neckY + 8} width="32" height={104 - neckY - 6} fill={`url(#au${id})`} />
-      {k === 0 && (
+      {/* flared gold collar */}
+      <path d="M78 119 L82 106 Q84 100 88 99 H112 Q116 100 118 106 L122 119 Z" fill={`url(#au${id})`} />
+      <rect x="84" y="90" width="32" height="10" rx="2" fill={`url(#au${id})`} />
+      <path d="M84 95 H116 M81 111 H119" stroke="#7a5c10" strokeOpacity=".45" strokeWidth="1" />
+
+      {/* faceted crystal cap, with the gold stem showing through */}
+      <rect x="94" y={squareCap ? 40 : 50} width="12" height={squareCap ? 50 : 40} fill={`url(#au${id})`} opacity=".55" />
+      {squareCap ? (
         <g>
-          <path d="M70 52 H130 L140 66 L100 98 L60 66 Z" fill={`url(#au${id})`} />
-          <path d="M70 52 L85 66 H115 L130 52 M60 66 H140 M85 66 L100 98 L115 66" stroke="#7a5c10" strokeOpacity=".55" fill="none" />
-          <path d="M100 20 C92 32 92 42 100 50 C108 42 108 32 100 20 Z" fill={`url(#au${id})`} />
+          <rect x="68" y="22" width="64" height="68" rx="4" fill={`url(#cr${id})`} stroke="#ffffff" strokeOpacity=".8" strokeWidth="1.3" />
+          <rect x="76" y="30" width="48" height="52" rx="2" fill="none" stroke="#ffffff" strokeOpacity=".45" />
+          <path d="M68 22 L76 30 M132 22 L124 30 M68 90 L76 82 M132 90 L124 82" stroke="#ffffff" strokeOpacity=".45" />
+        </g>
+      ) : (
+        <g>
+          <path d="M72 26 H128 L144 50 L118 90 H82 L56 50 Z" fill={`url(#cr${id})`} stroke="#ffffff" strokeOpacity=".8" strokeWidth="1.3" strokeLinejoin="round" />
+          <path d="M72 26 L86 50 L100 26 L114 50 L128 26 M56 50 H144 M86 50 L96 90 M114 50 L104 90 M86 50 L82 90 M114 50 L118 90" fill="none" stroke="#ffffff" strokeOpacity=".5" strokeWidth="1" />
+          <path d="M76 30 L84 44" stroke="#ffffff" strokeOpacity=".9" strokeWidth="2" strokeLinecap="round" />
         </g>
       )}
-      {k === 1 && <rect x="74" y="22" width="52" height="54" rx="4" fill={`url(#au${id})`} />}
-      {k === 2 && <circle cx="100" cy="62" r="30" fill={`url(#au${id})`} />}
-      {k === 3 && <path d="M66 88 L78 40 H122 L134 88 Z" fill={`url(#au${id})`} />}
     </svg>
   );
 }

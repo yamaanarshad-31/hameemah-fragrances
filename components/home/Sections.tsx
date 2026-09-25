@@ -1,10 +1,11 @@
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Clock, Gift, RefreshCcw, ShieldCheck, Star, Truck } from "lucide-react";
+import { ArrowUpRight, Clock, Gem, RefreshCcw, ShieldCheck, Star, Truck } from "lucide-react";
 import { Bottle } from "@/components/store/Bottle";
 import { Reveal, SplitHeading } from "@/components/store/Reveal";
 
 export function WordMarquee() {
-  const words = ["Long Lasting", "Oud", "Attar", "Rose", "Musk", "Amber", "Saffron", "Leather", "Jasmine", "Vetiver"];
+  const words = ["Long Lasting", "Sandalwood", "Vetiver", "Rose", "Musk", "Amber", "Saffron", "Leather", "Jasmine", "Bergamot"];
   return (
     <div className="relative overflow-hidden border-y border-gold/20 bg-forest py-6" style={{ ["--marquee-dur" as string]: "35s" }}>
       <div className="flex w-max animate-marquee">
@@ -32,7 +33,7 @@ export function Categories({ cats, sample }: { cats: Cat[]; sample: Record<numbe
         <Reveal><p className="eyebrow text-gold-3">Shop by family</p></Reveal>
         <SplitHeading text="Find the scent that feels like you" className="mt-4 max-w-3xl font-display text-5xl leading-[1.05] text-ink sm:text-6xl" />
       </div>
-      <div className="mt-16 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+      <div className="mt-16 grid grid-cols-2 gap-4 md:grid-cols-3">
         {cats.map((c, i) => (
           <Reveal key={c.id} delay={i * 0.08} className={i === 0 ? "col-span-2 md:col-span-1" : ""}>
             <Link href={`/collections/${c.slug}`} className="group relative block h-80 overflow-hidden rounded-[1.6rem] text-cream lg:h-[26rem]" style={{ background: `linear-gradient(170deg, ${c.color}, #06140d)` }}>
@@ -112,27 +113,23 @@ export function ReviewWall({ reviews }: { reviews: Rev[] }) {
   );
 }
 
-export function GiftBand() {
+export function BottleBand() {
   return (
     <section className="px-5 lg:px-8">
       <div className="grain relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-emerald px-6 py-16 text-cream sm:px-14 lg:py-20">
         <div className="absolute -right-20 -top-20 size-96 rounded-full bg-gold/20 blur-3xl" />
         <div className="relative grid grid-cols-[minmax(0,1fr)] items-center gap-10 lg:grid-cols-2">
           <Reveal>
-            <p className="eyebrow flex items-center gap-2 text-gold"><Gift className="size-4" /> The perfect gift</p>
-            <h2 className="mt-4 font-display text-5xl leading-tight sm:text-6xl">Gift boxes that <i className="text-gold-shine">say it all</i></h2>
-            <p className="mt-4 max-w-md text-cream/70">Four bestsellers in travel sizes, wrapped in our green-and-gold keepsake box. Add a handwritten note at checkout — we&apos;ll do the rest.</p>
-            <Link href="/collections/gift-sets" className="btn-gold mt-8 inline-flex rounded-full px-8 py-4 text-sm font-bold uppercase tracking-[0.2em]">Shop gift sets</Link>
+            <p className="eyebrow flex items-center gap-2 text-gold"><Gem className="size-4" /> Our signature bottle</p>
+            <h2 className="mt-4 font-display text-5xl leading-tight sm:text-6xl">Crystal cap, <i className="text-gold-shine">gold collar</i></h2>
+            <p className="mt-4 max-w-md text-cream/70">Every scent is bottled in faceted octagonal glass, crowned with a cut-crystal cap and a polished gold collar — a bottle you&apos;ll want to keep on show.</p>
+            <Link href="/shop" className="btn-gold mt-8 inline-flex rounded-full px-8 py-4 text-sm font-bold uppercase tracking-[0.2em]">Shop the collection</Link>
           </Reveal>
-          <div className="relative flex h-60 items-end justify-center gap-1 sm:h-80 sm:gap-2">
-            {[["#5a2d0c", 0], ["#0f5132", 1], ["#b0415b", 2], ["#8a1f11", 3]].map(([c, s], i) => (
-              <Reveal key={i} delay={0.15 * i} y={80}>
-                <div className="animate-float" style={{ animationDelay: `${i * 0.6}s` }}>
-                  <Bottle color={c as string} shape={s as number} className={`w-auto drop-shadow-[0_25px_25px_rgba(0,0,0,.45)] ${i % 3 === 0 ? "h-44 sm:h-64" : "h-36 sm:h-52"}`} />
-                </div>
-              </Reveal>
-            ))}
-          </div>
+          <Reveal delay={0.15} y={80}>
+            <div className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden rounded-[1.6rem] shadow-[0_30px_60px_-30px_rgba(0,0,0,.6)]">
+              <Image src="/photos/bottles-group.webp" alt="Fragrances by Hameemah perfume bottles with crystal caps and gold collars" fill sizes="(max-width:1024px) 90vw, 384px" className="object-cover" />
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>

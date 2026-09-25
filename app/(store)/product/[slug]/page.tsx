@@ -12,15 +12,15 @@ import { isSampleReview } from "@/lib/db/seed";
 import { BRAND, SITE_URL, STORE_ID, abs, clip, ld, pageMeta } from "@/lib/site";
 
 /** "Eau de Parfum" → "EDP" etc. for tighter titles. */
-const shortConc = (c: string | null) => ({ "Eau de Parfum": "EDP", "Extrait de Parfum": "Extrait", "Eau de Toilette": "EDT", "Attar (Oil)": "Attar" })[c ?? ""] ?? c ?? "";
+const shortConc = (c: string | null) => ({ "Eau de Parfum": "EDP", "Extrait de Parfum": "Extrait", "Eau de Toilette": "EDT" })[c ?? ""] ?? c ?? "";
 
 export async function generateMetadata({ params }: PageProps<"/product/[slug]">): Promise<Metadata> {
   const r = await getProduct((await params).slug);
   if (!r) return {};
   const p = r.product;
   const price = Math.min(...p.variants.map((v) => v.price));
-  const raw = p.categorySlug === "gift-sets" ? "Gift Set" : shortConc(p.concentration) || "Perfume";
-  const kind = p.name.toLowerCase().includes(raw.split(" ")[0].toLowerCase()) ? "" : raw; // avoid "White Oudh Attar Attar"
+  const raw = shortConc(p.concentration) || "Perfume";
+  const kind = p.name.toLowerCase().includes(raw.split(" ")[0].toLowerCase()) ? "" : raw; // avoid doubling a word already in the name
 
   return pageMeta({
     title: `${[p.name, kind].filter(Boolean).join(" ")} Price in Pakistan`,
@@ -92,7 +92,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
     url,
     additionalProperty: [
       { "@type": "PropertyValue", name: "Concentration", value: p.concentration },
-      ...(p.topNotes && p.categorySlug !== "gift-sets"
+      ...(p.topNotes
         ? [
             { "@type": "PropertyValue", name: "Top notes", value: p.topNotes },
             { "@type": "PropertyValue", name: "Heart notes", value: p.heartNotes },
@@ -154,7 +154,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
         <ProductView p={p} whatsapp={settings.whatsapp} />
       </div>
 
-      {p.topNotes && p.categorySlug !== "gift-sets" && (
+      {p.topNotes && (
         <section className="mx-auto mt-24 max-w-3xl px-5">
           <p className="eyebrow text-center text-gold-3">Fragrance notes</p>
           <h2 className="mb-10 mt-3 text-center font-display text-5xl">The scent pyramid</h2>

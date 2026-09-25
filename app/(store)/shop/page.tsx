@@ -42,7 +42,7 @@ export default async function Shop({ searchParams }: PageProps<"/shop">) {
   return (
     <>
       {!q && <script type="application/ld+json" dangerouslySetInnerHTML={ld(jsonLd)} />}
-      <PageHero eyebrow="The collection" title="All Fragrances" sub="Every scent we make — from fresh everyday favourites to deep, smoky ouds." />
+      <PageHero eyebrow="The collection" title="All Fragrances" sub="Every scent we make — from fresh everyday favourites to deep, smoky leathers." />
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Suspense>
           <ShopControls cats={cats} count={items.length} />

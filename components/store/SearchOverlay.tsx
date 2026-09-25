@@ -58,7 +58,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
                   onClose();
                 }}
                 enterKeyHint="search"
-                placeholder="Search oud, rose, fresh…"
+                placeholder="Search rose, amber, fresh…"
                 className="w-full bg-transparent font-display text-3xl text-cream placeholder:text-cream/30 focus:outline-none sm:text-5xl"
                 aria-label="Search perfumes"
               />

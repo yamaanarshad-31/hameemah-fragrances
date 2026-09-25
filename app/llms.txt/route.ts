@@ -9,7 +9,7 @@ export async function GET() {
   const lines = [
     "# Fragrances by Hameemah",
     "",
-    "> Online perfume house in Pakistan selling long-lasting luxury perfumes (Eau de Parfum, Extrait), oud and alcohol-free attars. Cash on delivery nationwide.",
+    "> Online perfume house in Pakistan selling long-lasting luxury perfumes (Eau de Parfum, Extrait) for men and women in 50ml and 100ml bottles. Cash on delivery nationwide.",
     "",
     `- Delivery: all over Pakistan, usually 2–4 working days. Delivery charge Rs. ${s.shippingFee}; free above Rs. ${s.freeShippingOver}.`,
     "- Payment: cash on delivery, bank transfer, JazzCash, Easypaisa.",

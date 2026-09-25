@@ -26,7 +26,7 @@ export default async function StoreLayout({ children }: LayoutProps<"/">) {
       url: SITE_URL,
       logo: `${SITE_URL}/brand/logo-full.png`,
       image: `${SITE_URL}/opengraph-image.jpg`,
-      description: "Online perfume house in Pakistan selling long-lasting luxury perfumes, oud and alcohol-free attars with cash on delivery nationwide.",
+      description: "Online perfume house in Pakistan selling long-lasting luxury perfumes for men and women with cash on delivery nationwide.",
       email: settings.email,
       telephone: settings.phone,
       address: { "@type": "PostalAddress", addressCountry: "PK" },

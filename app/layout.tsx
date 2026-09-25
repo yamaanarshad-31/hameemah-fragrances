@@ -13,9 +13,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: `${BRAND} | Luxury Perfumes in Pakistan`, template: `%s | ${BRAND}` },
   description:
-    "Shop long-lasting luxury perfumes, oud and attars from Fragrances by Hameemah. Cash on delivery and fast shipping all over Pakistan.",
+    "Shop long-lasting luxury perfumes for men and women from Fragrances by Hameemah. Cash on delivery and fast shipping all over Pakistan.",
   applicationName: BRAND,
-  keywords: ["perfume Pakistan", "best perfume in Pakistan", "oud perfume", "attar", "long lasting perfume", "perfume for men", "perfume for women", BRAND],
+  keywords: ["perfume Pakistan", "best perfume in Pakistan", "unisex perfume", "Eau de Parfum", "long lasting perfume", "perfume for men", "perfume for women", BRAND],
   // No site-wide canonical: each indexable page sets its own, so noindex pages don't point at the home page.
   openGraph: { type: "website", siteName: BRAND, locale: "en_PK" },
   twitter: { card: "summary_large_image" },

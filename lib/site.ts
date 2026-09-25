@@ -24,7 +24,7 @@ export function clip(text: string | null | undefined, max = 155) {
 }
 
 /** app/opengraph-image.jpg — restated because a page's own openGraph object drops the file-based image. */
-export const DEFAULT_OG = { url: "/opengraph-image.jpg", width: 1200, height: 630, alt: "Fragrances by Hameemah — luxury perfumes, oud and attars delivered across Pakistan" };
+export const DEFAULT_OG = { url: "/opengraph-image.jpg", width: 1200, height: 630, alt: "Fragrances by Hameemah — long-lasting luxury perfumes delivered across Pakistan" };
 
 /**
  * Per-page metadata with canonical, Open Graph and Twitter tags.

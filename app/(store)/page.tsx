@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/home/Hero";
-import { Categories, GiftBand, ReviewWall, WhyUs, WordMarquee } from "@/components/home/Sections";
+import { BottleBand, Categories, ReviewWall, WhyUs, WordMarquee } from "@/components/home/Sections";
 import { ProductTabs } from "@/components/home/ProductTabs";
 import { ScentAnatomy } from "@/components/home/ScentAnatomy";
 import { ScentFinder } from "@/components/home/ScentFinder";
@@ -13,7 +13,7 @@ import { BRAND, ld, pageMeta } from "@/lib/site";
 export const metadata: Metadata = {
   ...pageMeta({
     title: "Luxury Perfumes in Pakistan",
-    description: "Shop long-lasting luxury perfumes, oud and attars from Fragrances by Hameemah. Perfumes for men and women with cash on delivery and fast shipping all over Pakistan.",
+    description: "Shop long-lasting luxury perfumes for men and women from Fragrances by Hameemah, in 50ml and 100ml bottles. Cash on delivery and fast shipping all over Pakistan.",
     path: "/",
   }),
   title: { absolute: `${BRAND} | Long-Lasting Luxury Perfumes in Pakistan` },
@@ -36,7 +36,7 @@ export default async function Home() {
     { key: "new", label: "New in", items: (newest.length ? newest : all).map(toCard) },
     { key: "all", label: "All", items: all.map(toCard) },
   ];
-  const anatomy = all.find((p) => p.featured && p.topNotes && p.categorySlug !== "gift-sets") ?? all[0];
+  const anatomy = all.find((p) => p.featured && p.topNotes) ?? all[0];
   const finder = all.map((p) => ({ ...toCard(p), categorySlug: p.categorySlug, notes: `${p.topNotes} ${p.heartNotes} ${p.baseNotes}`, longevity: p.longevity, sillage: p.sillage }));
   const freeOver = Number(settings.freeShippingOver) || 0;
 
@@ -53,7 +53,7 @@ export default async function Home() {
       {anatomy && <ScentAnatomy p={anatomy} />}
       <ScentFinder products={finder} />
       <ReviewWall reviews={reviews} />
-      <GiftBand />
+      <BottleBand />
       <WhyUs freeOver={freeOver} />
       <Faq />
     </>

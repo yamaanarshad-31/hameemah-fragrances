@@ -19,7 +19,7 @@ export type Init = {
 const EMPTY: Init = {
   name: "", slug: "", tagline: "", description: "", categoryId: null, concentration: "Eau de Parfum",
   topNotes: "", heartNotes: "", baseNotes: "", longevity: 4, sillage: 3,
-  variants: [{ size: "50ml", price: 2990, compareAt: null, stock: 20 }], images: [], color: "#b8860b", shape: 0,
+  variants: [{ size: "50ml", price: 2990, compareAt: null, stock: 20 }, { size: "100ml", price: 4490, compareAt: null, stock: 20 }], images: [], color: "#b8860b", shape: 0,
   featured: false, bestseller: false, isNew: true, active: true,
 };
 
@@ -72,8 +72,8 @@ export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) 
         <Card>
           <p className="mb-4 font-semibold">Basics</p>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="sm:col-span-2"><span className={labelCls}>Product name *</span><input className={`${inputCls} mt-1.5`} value={p.name} onChange={(e) => set("name", e.target.value)} placeholder="e.g. Oud Al Hameem" /></label>
-            <label className="sm:col-span-2"><span className={labelCls}>Short tagline</span><input className={`${inputCls} mt-1.5`} value={p.tagline ?? ""} onChange={(e) => set("tagline", e.target.value)} placeholder="Smoky royal oud with a rose heart" /></label>
+            <label className="sm:col-span-2"><span className={labelCls}>Product name *</span><input className={`${inputCls} mt-1.5`} value={p.name} onChange={(e) => set("name", e.target.value)} placeholder="e.g. Emerald Noir" /></label>
+            <label className="sm:col-span-2"><span className={labelCls}>Short tagline</span><input className={`${inputCls} mt-1.5`} value={p.tagline ?? ""} onChange={(e) => set("tagline", e.target.value)} placeholder="Fresh green vetiver, dark and magnetic" /></label>
             <label><span className={labelCls}>Category</span>
               <select className={`${inputCls} mt-1.5`} value={p.categoryId ?? ""} onChange={(e) => set("categoryId", e.target.value ? Number(e.target.value) : null)}>
                 <option value="">— None —</option>{cats.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -81,7 +81,7 @@ export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) 
             </label>
             <label><span className={labelCls}>Type</span>
               <input className={`${inputCls} mt-1.5`} list="conc" value={p.concentration ?? ""} onChange={(e) => set("concentration", e.target.value)} />
-              <datalist id="conc">{["Eau de Parfum", "Extrait de Parfum", "Eau de Toilette", "Attar (Oil)", "Body Mist", "Gift Set"].map((c) => <option key={c} value={c} />)}</datalist>
+              <datalist id="conc">{["Eau de Parfum", "Extrait de Parfum", "Eau de Toilette", "Body Mist"].map((c) => <option key={c} value={c} />)}</datalist>
             </label>
             <label className="sm:col-span-2"><span className={labelCls}>Description</span><textarea rows={4} className={`${inputCls} mt-1.5`} value={p.description ?? ""} onChange={(e) => set("description", e.target.value)} placeholder="Describe how it smells and when to wear it…" /></label>
             <label className="sm:col-span-2"><span className={labelCls}>URL (leave empty to generate from name)</span>
@@ -135,7 +135,7 @@ export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) 
                 <button type="button" disabled={p.variants.length === 1} onClick={() => set("variants", p.variants.filter((_, k) => k !== i))} className="flex items-center justify-center rounded-xl text-muted hover:bg-red-50 hover:text-red-700 disabled:opacity-30" aria-label="Remove size"><Trash2 className="size-4" /></button>
               </div>
             ))}
-            <button type="button" onClick={() => set("variants", [...p.variants, { size: "", price: 0, compareAt: null, stock: 0 }])} className="flex items-center gap-1.5 text-sm font-semibold text-emerald"><Plus className="size-4" /> Add size</button>
+            <button type="button" onClick={() => set("variants", [...p.variants, { size: ["50ml", "100ml"].find((z) => !p.variants.some((v) => v.size === z)) ?? "", price: 0, compareAt: null, stock: 0 }])} className="flex items-center gap-1.5 text-sm font-semibold text-emerald"><Plus className="size-4" /> Add size</button>
           </div>
         </Card>
 
