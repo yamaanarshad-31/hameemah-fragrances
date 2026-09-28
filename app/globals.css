@@ -171,6 +171,15 @@ input, textarea, select { font: inherit; }
 /* the hero photo settles in slowly from a slight zoom */
 .hero-scene { animation: heroScene 2.6s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--hero-wait, 2.5s) - .3s); }
 @keyframes heroScene { from { opacity: 0; transform: scale(1.08); } }
+/* life on the hero photo (components/home/Hero.tsx): a light sweep across the glass, masked to the
+   bottle's silhouette; a warm glow that breathes around it; bokeh that twinkles */
+.hero-glint { -webkit-mask: url(/photos/bottle-cutout.webp) center / 100% 100% no-repeat; mask: url(/photos/bottle-cutout.webp) center / 100% 100% no-repeat; mix-blend-mode: screen; overflow: hidden; pointer-events: none; }
+.hero-glint::before { content: ""; position: absolute; inset: -10% -80%; background: linear-gradient(100deg, transparent 42%, rgba(255,240,205,.0) 44%, rgba(255,240,205,.55) 50%, rgba(255,240,205,0) 56%, transparent 58%); animation: heroGlint 7s cubic-bezier(.45,0,.2,1) infinite; animation-delay: calc(var(--hero-wait, 2.5s) + 1.2s); transform: translateX(-60%); }
+@keyframes heroGlint { 0% { transform: translateX(-60%); } 38%, 100% { transform: translateX(60%); } }
+.hero-bloom { background: radial-gradient(closest-side, rgba(255,214,140,.30), rgba(255,214,140,.08) 55%, transparent 75%); mix-blend-mode: screen; pointer-events: none; animation: heroBloom 5.5s ease-in-out infinite; }
+@keyframes heroBloom { 0%, 100% { opacity: .55; transform: scale(.96); } 50% { opacity: 1; transform: scale(1.04); } }
+.hero-bokeh { width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: radial-gradient(circle, rgba(255,230,170,.9), rgba(255,230,170,0) 70%); pointer-events: none; animation: heroBokeh 4.5s ease-in-out infinite both; }
+@keyframes heroBokeh { 0%, 100% { opacity: 0; transform: scale(.4); } 50% { opacity: .9; transform: scale(1.6); } }
 .intro-seen { --hero-wait: 0.1s; }
 @keyframes heroUp { from { opacity: 0; transform: translateY(20px); } }
 @keyframes heroWord { from { transform: translateY(110%) rotate(6deg); } }

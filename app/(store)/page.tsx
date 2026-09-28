@@ -36,6 +36,7 @@ export default async function Home() {
   const anatomy = all.find((p) => p.featured && p.topNotes) ?? all[0];
   const finder = all.map((p) => ({ id: p.id, categorySlug: p.categorySlug, notes: `${p.topNotes} ${p.heartNotes} ${p.baseNotes}`, longevity: p.longevity, sillage: p.sillage }));
   const freeOver = Number(settings.freeShippingOver) || 0;
+  const fromPrice = Math.min(...all.flatMap((p) => p.variants.map((v) => v.price)));
 
   // Store + WebSite markup lives in the store layout; the FAQ is specific to this page.
   const jsonLd = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: FAQS.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) };
@@ -43,7 +44,7 @@ export default async function Home() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={ld(jsonLd)} />
-      <Hero title={settings.heroTitle} subtitle={settings.heroSubtitle} freeOver={freeOver} />
+      <Hero count={all.length} fromPrice={Number.isFinite(fromPrice) ? fromPrice : 0} title={settings.heroTitle} subtitle={settings.heroSubtitle} freeOver={freeOver} />
       <WordMarquee />
       <Categories cats={cats} sample={sample} />
       <HomeCards cards={cards}>
