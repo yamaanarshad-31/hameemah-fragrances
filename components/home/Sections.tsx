@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Clock, Gem, RefreshCcw, ShieldCheck, Truck } from "lucide-react";
 import { Stars } from "@/components/store/Stars";
-import { Bottle } from "@/components/store/Bottle";
+import { SignatureBottle } from "@/components/store/SignatureBottle";
 import { Reveal, SplitHeading } from "@/components/store/Reveal";
 
 export function WordMarquee() {
@@ -41,7 +41,7 @@ export function Categories({ cats, sample }: { cats: Cat[]; sample: Record<numbe
             <Link href={`/collections/${c.slug}`} className="group relative block h-72 overflow-hidden rounded-[1.6rem] text-cream sm:h-80 lg:h-[26rem]" style={{ background: `linear-gradient(170deg, ${c.color}, #06140d)` }}>
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(243,220,143,.25),transparent_60%)] opacity-60 transition duration-700 group-hover:opacity-100" />
               <div className="absolute inset-x-0 top-8 flex justify-center transition duration-[900ms] ease-out group-hover:-translate-y-4 group-hover:scale-110">
-                <Bottle color={sample[c.id]?.color} shape={sample[c.id]?.shape ?? i} name={c.name} className="h-40 w-auto drop-shadow-[0_25px_25px_rgba(0,0,0,.5)] sm:h-44 lg:h-56" />
+                <SignatureBottle name={c.name} sizes="(max-width:1024px) 120px, 150px" className="h-40 drop-shadow-[0_25px_25px_rgba(0,0,0,.5)] sm:h-44 lg:h-56" />
               </div>
               <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
                 <p className="font-display text-[1.75rem] leading-tight sm:text-3xl">{c.name}</p>
@@ -129,7 +129,7 @@ export function BottleBand() {
           </Reveal>
           <Reveal delay={0.15} y={80}>
             <div className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden rounded-[1.6rem] shadow-[0_30px_60px_-30px_rgba(0,0,0,.6)]">
-              <Image src="/photos/bottles-group.webp" alt="Fragrances by Hameemah perfume bottles with crystal caps and gold collars" fill sizes="(max-width:1024px) 90vw, 384px" className="object-cover" />
+              <Image src="/photos/bottle-signature.webp" alt="Fragrances by Hameemah perfume bottle with a crystal cap and gold collar" fill sizes="(max-width:1024px) 90vw, 384px" className="object-cover" />
             </div>
           </Reveal>
         </div>

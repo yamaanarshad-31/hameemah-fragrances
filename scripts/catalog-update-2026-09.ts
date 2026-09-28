@@ -1,6 +1,9 @@
 /**
  * Catalogue update, September 2026. Safe to run more than once.
  *
+ * The bottle photos it reads were later replaced (scripts/photos-signature-2026-09.ts) and
+ * are no longer in public/photos; run that script after this one on an old database.
+ *
  *   - Removes the "Oud & Attar" and "Gift Sets" collections, their products, those
  *     products' reviews and their photos.
  *   - Every perfume is now sold in 50ml and 100ml only: 30ml sizes are removed.

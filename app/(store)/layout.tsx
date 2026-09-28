@@ -34,7 +34,8 @@ export default async function StoreLayout({ children }: LayoutProps<"/">) {
       currenciesAccepted: "PKR",
       paymentAccepted: "Cash on delivery, Bank transfer, JazzCash, Easypaisa",
       ...(sameAs.length ? { sameAs } : {}),
-      contactPoint: { "@type": "ContactPoint", telephone: settings.phone, email: settings.email, contactType: "customer service", areaServed: "PK", availableLanguage: ["English", "Urdu"] },
+      slogan: "Wear a scent they'll remember",
+      contactPoint: { "@type": "ContactPoint", telephone: settings.phone, email: settings.email, url: `https://wa.me/${settings.whatsapp}`, contactType: "customer service", contactOption: "WhatsApp", areaServed: "PK", availableLanguage: ["English", "Urdu"] },
     },
     {
       "@context": "https://schema.org",

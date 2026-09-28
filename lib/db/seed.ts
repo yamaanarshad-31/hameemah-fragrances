@@ -4,12 +4,12 @@ import * as s from "./schema";
 
 export const DEFAULT_SETTINGS: Record<string, string> = {
   announcement: "Free delivery on orders above Rs. 5,000 | Cash on Delivery all over Pakistan | Use code WELCOME10 for 10% off",
-  whatsapp: "923001234567",
-  phone: "0300 1234567",
-  email: "info@fragrancesbyhameemah.com",
-  instagram: "https://instagram.com/",
-  facebook: "https://facebook.com/",
-  tiktok: "https://tiktok.com/",
+  whatsapp: "923112980672",
+  phone: "0311 2980672",
+  email: "fragrancesbyhameemah@gmail.com",
+  instagram: "https://www.instagram.com/fragrancesbyhameemah",
+  facebook: "https://www.facebook.com/share/1HraJVRxJE/",
+  tiktok: "https://www.tiktok.com/@fragrancesbyhameemah",
   shippingFee: "250",
   freeShippingOver: "5000",
   heroTitle: "Wear a scent they'll remember",
@@ -26,11 +26,10 @@ const v = (b: number, c: number, sale = 0): s.Variant[] => [
 
 type SeedProduct = Omit<typeof s.products.$inferInsert, "createdAt" | "images" | "categoryId"> & { cat: string };
 
-// Real photos of the shop's bottles (public/photos). The blue bottle goes with the fresh,
-// blue scents; the clear one with the rest. The group shot is every product's second photo.
-const PHOTO = { clear: "/photos/bottle-clear.webp", blue: "/photos/bottle-blue.webp", group: "/photos/bottles-group.webp" };
+// The house bottle (public/photos): the studio shot first, the close-up of the monogram second.
+export const PHOTO = { signature: "/photos/bottle-signature.webp", detail: "/photos/bottle-detail.webp" };
 export const BLUE_BOTTLE = new Set(["ocean-crown", "citrus-couture", "emerald-noir"]);
-export const photosFor = (slug: string) => [BLUE_BOTTLE.has(slug) ? PHOTO.blue : PHOTO.clear, PHOTO.group];
+export const photosFor = () => [PHOTO.signature, PHOTO.detail];
 
 const PRODUCTS: SeedProduct[] = [
   { name: "Emerald Noir", slug: "emerald-noir", cat: "men", tagline: "Fresh green vetiver, dark and magnetic",
@@ -99,7 +98,7 @@ export async function seed(db: LibSQLDatabase<typeof s>) {
   const catId = (slug: string) => cats.find((c) => c.slug === slug)?.id ?? null;
 
   await db.insert(s.products).values(
-    PRODUCTS.map(({ cat, ...p }, i) => ({ ...p, categoryId: catId(cat), images: photosFor(p.slug), createdAt: now - i * 86400000 })),
+    PRODUCTS.map(({ cat, ...p }, i) => ({ ...p, categoryId: catId(cat), images: photosFor(), createdAt: now - i * 86400000 })),
   ).onConflictDoNothing();
   const prods = await db.select({ id: s.products.id, slug: s.products.slug }).from(s.products);
   const pid = (slug: string) => prods.find((p) => p.slug === slug)!.id;

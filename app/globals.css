@@ -168,6 +168,9 @@ input, textarea, select { font: inherit; }
 .hero-word { animation-name: heroWord; animation-duration: 1.1s; }
 .hero-pop { animation: heroPop 1.4s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--hero-wait, 2.5s) + var(--i, 0) * 1s); }
 @keyframes heroPop { from { opacity: 0; transform: scale(.8); } }
+/* the hero photo settles in slowly from a slight zoom */
+.hero-scene { animation: heroScene 2.6s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--hero-wait, 2.5s) - .3s); }
+@keyframes heroScene { from { opacity: 0; transform: scale(1.08); } }
 .intro-seen { --hero-wait: 0.1s; }
 @keyframes heroUp { from { opacity: 0; transform: translateY(20px); } }
 @keyframes heroWord { from { transform: translateY(110%) rotate(6deg); } }

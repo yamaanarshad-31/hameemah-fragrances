@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRef } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
-import { Bottle } from "@/components/store/Bottle";
+import { SignatureBottle } from "@/components/store/SignatureBottle";
 import { ArrowRight } from "lucide-react";
 
 type P = { name: string; slug: string; color: string | null; shape: number | null; topNotes: string | null; heartNotes: string | null; baseNotes: string | null; description?: string | null };
@@ -42,7 +42,7 @@ export function ScentAnatomy({ p }: { p: P }) {
               <motion.circle cx="50" cy="50" r="48" fill="none" stroke="#d4af37" strokeWidth=".6" style={{ pathLength: ring }} />
             </svg>
             <motion.div style={{ rotate, scale }} className="absolute inset-[10%] flex items-center justify-center">
-              <Bottle color={p.color} shape={p.shape} name={p.name} className="h-full w-auto drop-shadow-[0_40px_40px_rgba(0,0,0,.6)]" />
+              <SignatureBottle name={p.name} sizes="240px" className="h-full drop-shadow-[0_40px_40px_rgba(0,0,0,.6)]" />
             </motion.div>
           </div>
           <div>

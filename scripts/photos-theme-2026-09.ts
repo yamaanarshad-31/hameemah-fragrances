@@ -1,6 +1,9 @@
 /**
  * Bottle photos restyled for the site theme, September 2026. Safe to run more than once.
  *
+ * Superseded by scripts/photos-signature-2026-09.ts, which replaces these photos too; the
+ * files this script reads are gone from public/photos. Kept for the record.
+ *
  * public/photos/*.webp were re-made as studio shots on the brand's emerald and gold set.
  * scripts/catalog-update-2026-09.ts had stored the previous crops in the `images` table
  * (id = md5 of the file), so products still point at those rows. This script:

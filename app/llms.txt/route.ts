@@ -1,4 +1,5 @@
 import { getCategories, getProducts, getSettings } from "@/lib/data";
+import { FAQS } from "@/lib/faqs";
 import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +15,9 @@ export async function GET() {
     `- Delivery: all over Pakistan, usually 2–4 working days. Delivery charge Rs. ${s.shippingFee}; free above Rs. ${s.freeShippingOver}.`,
     "- Payment: cash on delivery, bank transfer, JazzCash, Easypaisa.",
     "- Exchange: unused sealed bottles within 7 days; damaged/wrong items replaced free.",
-    `- Contact: WhatsApp ${s.phone}, email ${s.email}`,
+    `- Contact: WhatsApp ${s.phone} (https://wa.me/${s.whatsapp}), email ${s.email}`,
+    `- Social: Instagram ${s.instagram} · TikTok ${s.tiktok} · Facebook ${s.facebook}`,
+    "- Cities: delivers to every city in Pakistan, including Karachi, Lahore, Islamabad, Rawalpindi, Faisalabad, Multan and Peshawar.",
     "",
     "## Collections",
     ...cats.map((c) => `- [${c.name}](${SITE_URL}/collections/${c.slug}): ${c.blurb}`),
@@ -22,6 +25,8 @@ export async function GET() {
     "## Perfumes",
     ...products.map((p) => `- [${p.name}](${SITE_URL}/product/${p.slug}): ${p.tagline}. Notes: ${[p.topNotes, p.heartNotes, p.baseNotes].filter(Boolean).join("; ")}. Sizes: ${p.variants.map((v) => `${v.size} Rs. ${v.price}`).join(", ")}.`),
     "",
+    "## FAQ",
+    ...FAQS.flatMap((f) => [`### ${f.q}`, f.a, ""]),
     "## Pages",
     `- [Shop all](${SITE_URL}/shop)`, `- [Track an order](${SITE_URL}/track-order)`, `- [Policies](${SITE_URL}/policies)`, `- [About](${SITE_URL}/about)`, `- [Contact](${SITE_URL}/contact)`,
   ];
