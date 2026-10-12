@@ -38,7 +38,7 @@ export function Categories({ cats, sample }: { cats: Cat[]; sample: Record<numbe
       <div className={`mt-12 grid grid-cols-2 gap-3 sm:mt-16 sm:gap-4 ${cats.length === 4 ? "md:grid-cols-4" : cats.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
         {cats.map((c, i) => (
           <Reveal key={c.id} delay={i * 0.08} className={i === 0 && cats.length % 2 === 1 ? "col-span-2 md:col-span-1" : ""}>
-            <Link href={`/collections/${c.slug}`} className="group relative block h-72 overflow-hidden rounded-[1.6rem] text-cream sm:h-80 lg:h-[26rem]" style={{ background: `linear-gradient(170deg, ${c.color}, #06140d)` }}>
+            <Link href={`/collections/${c.slug}`} className="group relative block h-72 overflow-hidden rounded-[1.6rem] text-cream sm:h-80 lg:h-[26rem]" style={{ background: `linear-gradient(170deg, ${c.color}, #0a0a09)` }}>
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(243,220,143,.25),transparent_60%)] opacity-60 transition duration-700 group-hover:opacity-100" />
               <div className="absolute inset-x-0 top-8 flex justify-center transition duration-[900ms] ease-out group-hover:-translate-y-4 group-hover:scale-110">
                 <SignatureBottle name={c.name} sizes="(max-width:1024px) 120px, 150px" className="h-40 drop-shadow-[0_25px_25px_rgba(0,0,0,.5)] sm:h-44 lg:h-56" />
@@ -99,7 +99,7 @@ export function ReviewWall({ reviews }: { reviews: Rev[] }) {
         {rows.map((row, r) => (
           <div key={r} className="flex w-max animate-marquee gap-4 will-change-transform hover:[animation-play-state:paused] sm:gap-5" style={{ ["--marquee-dur" as string]: r ? "70s" : "60s", animationDirection: r ? "reverse" : "normal" }}>
             {[...row, ...row].map((v, i) => (
-              <figure key={i} aria-hidden={i >= row.length || undefined} className="w-[17.5rem] shrink-0 rounded-3xl border border-cream-2 bg-white p-5 shadow-[0_15px_40px_-25px_rgba(6,20,13,.35)] sm:w-[22rem] sm:p-6">
+              <figure key={i} aria-hidden={i >= row.length || undefined} className="w-[17.5rem] shrink-0 rounded-3xl border border-cream-2 bg-white p-5 shadow-[0_15px_40px_-25px_rgba(10,10,9,.35)] sm:w-[22rem] sm:p-6">
                 <Stars value={v.rating} />
                 <blockquote className="mt-3 line-clamp-4 font-display text-lg leading-snug text-ink sm:text-xl">&ldquo;{v.body}&rdquo;</blockquote>
                 <figcaption className="mt-4 flex items-center justify-between gap-3 text-sm">

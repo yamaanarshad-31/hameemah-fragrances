@@ -54,7 +54,7 @@ export function ScentFinder({ products }: { products: P[] }) {
 
   return (
     <section id="scent-finder" className="relative scroll-mt-20 overflow-hidden bg-forest py-20 text-cream sm:py-24 lg:py-32">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(212,175,55,.15),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(21,82,56,.9),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(212,175,55,.15),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(43,41,37,.9),transparent_50%)]" />
       <div className="relative mx-auto max-w-5xl px-5 text-center">
         <p className="eyebrow flex items-center justify-center gap-2 text-gold"><Sparkles className="size-4" /> Scent finder</p>
         <h2 className="mt-4 font-display text-5xl leading-tight sm:text-6xl">Not sure what to choose? <i className="text-gold-shine">Let us help.</i></h2>

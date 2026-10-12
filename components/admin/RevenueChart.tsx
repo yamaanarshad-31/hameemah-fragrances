@@ -54,7 +54,7 @@ export function RevenueChart({ data }: { data: Pt[] }) {
               setHover(Math.max(0, Math.min(data.length - 1, Math.round(((px - L) / (W - L - R)) * (data.length - 1)))));
             }}>
             <defs>
-              <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#0f3d2a" stopOpacity=".28" /><stop offset="1" stopColor="#0f3d2a" stopOpacity="0" /></linearGradient>
+              <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#1c1b19" stopOpacity=".28" /><stop offset="1" stopColor="#1c1b19" stopOpacity="0" /></linearGradient>
             </defs>
             {ticks.map((t) => (
               <g key={t}>
@@ -68,10 +68,10 @@ export function RevenueChart({ data }: { data: Pt[] }) {
               return <text key={d.day} x={last ? x(i) + R : x(i)} y={H - 8} textAnchor={last ? "end" : "middle"} fontSize="11" fill="#6f7a72">{d.label}</text>;
             })}
             <path d={area} fill="url(#rev)" />
-            <path d={line} fill="none" stroke="#0f3d2a" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+            <path d={line} fill="none" stroke="#1c1b19" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
             {h && hover !== null && (
               <g>
-                <line x1={x(hover)} x2={x(hover)} y1={T} y2={y(0)} stroke="#0f3d2a" strokeOpacity=".3" strokeDasharray="3 3" />
+                <line x1={x(hover)} x2={x(hover)} y1={T} y2={y(0)} stroke="#1c1b19" strokeOpacity=".3" strokeDasharray="3 3" />
                 <circle cx={x(hover)} cy={y(h.revenue)} r="5" fill="#d4af37" stroke="#fff" strokeWidth="2" />
               </g>
             )}

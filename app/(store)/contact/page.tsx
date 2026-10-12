@@ -20,7 +20,7 @@ export default async function Contact() {
       <div className="mx-auto grid max-w-5xl gap-5 px-5 py-20 md:grid-cols-3">
         {cards.map(({ I, t, d, v, href }, i) => (
           <Reveal key={t} delay={i * 0.1}>
-            <a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="group block h-full rounded-[2rem] bg-white p-8 shadow-[0_30px_70px_-45px_rgba(6,20,13,.6)] transition hover:-translate-y-1">
+            <a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="group block h-full rounded-[2rem] bg-white p-8 shadow-[0_30px_70px_-45px_rgba(10,10,9,.6)] transition hover:-translate-y-1">
               <span className="flex size-14 items-center justify-center rounded-full bg-emerald text-gold transition group-hover:scale-110"><I className="size-6" /></span>
               <p className="mt-6 font-display text-3xl">{t}</p>
               <p className="text-sm text-muted">{d}</p>

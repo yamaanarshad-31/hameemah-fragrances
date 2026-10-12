@@ -23,7 +23,7 @@ const EMPTY: Init = {
   featured: false, bestseller: false, isNew: true, active: true,
 };
 
-const SWATCHES = ["#5a2d0c", "#8a1f11", "#b0415b", "#e8c7c1", "#c47a12", "#d9b43a", "#0f5132", "#1d5f8a", "#3b2a5c", "#2b1d14", "#e9dcc0", "#0f3d2a"];
+const SWATCHES = ["#5a2d0c", "#8a1f11", "#b0415b", "#e8c7c1", "#c47a12", "#d9b43a", "#0f5132", "#1d5f8a", "#3b2a5c", "#2b1d14", "#e9dcc0", "#1c1b19"];
 
 export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) {
   const router = useRouter();
@@ -150,7 +150,7 @@ export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) 
             {(["longevity", "sillage"] as const).map((k) => (
               <label key={k} className="sm:col-span-1">
                 <span className={labelCls}>{k === "longevity" ? "Longevity" : "Projection"}: {p[k]}/5</span>
-                <input type="range" min={1} max={5} value={Number(p[k])} onChange={(e) => set(k, Number(e.target.value))} className="mt-3 w-full accent-[#0f3d2a]" />
+                <input type="range" min={1} max={5} value={Number(p[k])} onChange={(e) => set(k, Number(e.target.value))} className="mt-3 w-full accent-[#1c1b19]" />
               </label>
             ))}
           </div>

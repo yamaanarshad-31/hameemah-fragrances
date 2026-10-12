@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #06140d;
-  --color-forest: #0a2a1c;
-  --color-emerald: #0f3d2a;
-  --color-emerald-2: #155238;
+  --color-ink: #0a0a09;
+  --color-forest: #121211;
+  --color-emerald: #1c1b19;
+  --color-emerald-2: #2b2925;
   --color-gold: #d4af37;
   --color-gold-2: #f3dc8f;
   --color-gold-3: #85650e;
   --color-cream: #f7f1e3;
   --color-cream-2: #efe5cf;
-  --color-muted: #56615a;
+  --color-muted: #5e5a53;
   --font-display: var(--font-cormorant), "Times New Roman", serif;
   --font-caps: var(--font-cinzel), "Times New Roman", serif;
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
@@ -86,7 +86,7 @@ body {
   overflow: hidden;
   isolation: isolate;
   background: linear-gradient(135deg, #f3dc8f 0%, #d4af37 50%, #b8922a 100%);
-  color: #06140d;
+  color: #0a0a09;
   transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s;
   box-shadow: 0 10px 30px -10px rgb(212 175 55 / .6);
 }

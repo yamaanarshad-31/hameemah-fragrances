@@ -1,7 +1,7 @@
 "use client";
 import { motion } from "motion/react";
 
-const COLORS = ["#d4af37", "#f3dc8f", "#0f3d2a", "#155238", "#fff3c4"];
+const COLORS = ["#d4af37", "#f3dc8f", "#a8841f", "#ffffff", "#fff3c4"];
 
 export function Confetti() {
   return (

@@ -123,7 +123,7 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
       </div>
 
       <aside className="min-w-0 lg:sticky lg:top-28 lg:self-start">
-        <div className="rounded-[2rem] bg-white p-5 shadow-[0_30px_70px_-40px_rgba(6,20,13,.5)] sm:p-6">
+        <div className="rounded-[2rem] bg-white p-5 shadow-[0_30px_70px_-40px_rgba(10,10,9,.5)] sm:p-6">
           <h2 className="font-display text-3xl">Order summary</h2>
           <ul className="mt-5 max-h-72 space-y-4 overflow-y-auto overscroll-contain pr-1 pt-1" data-lenis-prevent>
             {lines.map((l) => (

@@ -18,7 +18,7 @@ export const categories = sqliteTable("categories", {
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   blurb: text("blurb").default(""),
-  color: text("color").default("#0f3d2a"),
+  color: text("color").default("#1c1b19"),
   sort: integer("sort").default(0),
 });
 

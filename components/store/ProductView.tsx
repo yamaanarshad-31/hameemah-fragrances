@@ -76,9 +76,9 @@ export function ProductView({ p, whatsapp }: { p: P; whatsapp: string }) {
           onPointerMove={(e) => { if (!isMouse(e)) return; const r = e.currentTarget.getBoundingClientRect(); mx.set((e.clientX - r.left) / r.width); my.set((e.clientY - r.top) / r.height); }}
           onPointerLeave={() => { mx.set(0.5); my.set(0.5); }}
           style={lite ? undefined : { rotateX: rx, rotateY: ry, transformPerspective: 1100 }}
-          className="relative aspect-square overflow-hidden rounded-[2rem] shadow-[0_30px_80px_-40px_rgba(6,20,13,.7)]"
+          className="relative aspect-square overflow-hidden rounded-[2rem] shadow-[0_30px_80px_-40px_rgba(10,10,9,.7)]"
         >
-          <div className="absolute inset-0" style={{ background: `radial-gradient(circle at 50% 40%, ${p.color}66, transparent 60%), linear-gradient(180deg,#155238,#06140d)` }} />
+          <div className="absolute inset-0" style={{ background: `radial-gradient(circle at 50% 40%, ${p.color}66, transparent 60%), linear-gradient(180deg,#2b2925,#0a0a09)` }} />
           <div className="absolute inset-[12%] animate-spin-slow rounded-full border border-dashed border-gold/20" />
           <AnimatePresence mode="wait" initial={false}>
             <motion.div key={img} initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.04 }} transition={{ duration: 0.45 }} className="absolute inset-0">
@@ -178,7 +178,7 @@ export function ProductView({ p, whatsapp }: { p: P; whatsapp: string }) {
             animate={{ y: 0 }}
             exit={{ y: "110%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 z-30 border-t border-ink/10 bg-cream/95 px-4 pb-[calc(.75rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-12px_30px_-18px_rgba(6,20,13,.45)] lg:hidden"
+            className="fixed inset-x-0 bottom-0 z-30 border-t border-ink/10 bg-cream/95 px-4 pb-[calc(.75rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-12px_30px_-18px_rgba(10,10,9,.45)] lg:hidden"
           >
             <div className="mx-auto flex max-w-xl items-center gap-3">
               <div className="min-w-0 flex-1">

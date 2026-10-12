@@ -32,7 +32,7 @@ export function Intro() {
       <style>{`
         .intro-seen #intro{display:none}
         .intro{animation:introOff 0s linear 3.3s forwards}
-        .intro-panel{position:absolute;left:0;right:0;height:50.5%;background:radial-gradient(ellipse at center,#0f3d2a 0%,#06140d 75%)}
+        .intro-panel{position:absolute;left:0;right:0;height:50.5%;background:radial-gradient(ellipse at center,#1c1b19 0%,#0a0a09 75%)}
         .intro-top{top:0;animation:panelUp 1s cubic-bezier(.8,0,.2,1) 2.35s forwards}
         .intro-bot{bottom:0;animation:panelDown 1s cubic-bezier(.8,0,.2,1) 2.35s forwards}
         .intro-stage{animation:stageOut .6s ease 2.1s forwards}

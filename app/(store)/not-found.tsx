@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Page not found" };
 export default function NotFound() {
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-5 py-20 text-center">
-      <div className="flex size-56 items-center justify-center rounded-full bg-[radial-gradient(circle_at_50%_40%,#1f5a3f,#06140d_70%)] ring-1 ring-gold/30">
+      <div className="flex size-56 items-center justify-center rounded-full bg-[radial-gradient(circle_at_50%_40%,#33302a,#0a0a09_70%)] ring-1 ring-gold/30">
         <SignatureBottle className="h-40 animate-float drop-shadow-[0_20px_25px_rgba(0,0,0,.5)]" />
       </div>
       <p className="eyebrow mt-8 text-gold-3">Error 404</p>

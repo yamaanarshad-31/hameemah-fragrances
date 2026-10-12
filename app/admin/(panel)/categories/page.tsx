@@ -19,7 +19,7 @@ export default async function Categories() {
             <Card key={c.id} className="!p-4">
               <form action={saveCategory} className="grid items-end gap-3 sm:grid-cols-[48px_1fr_1fr_80px_auto]">
                 <input type="hidden" name="id" value={c.id} />
-                <label><span className="sr-only">Colour</span><input type="color" name="color" defaultValue={c.color ?? "#0f3d2a"} className="h-11 w-12 cursor-pointer rounded-lg" /></label>
+                <label><span className="sr-only">Colour</span><input type="color" name="color" defaultValue={c.color ?? "#1c1b19"} className="h-11 w-12 cursor-pointer rounded-lg" /></label>
                 <label><span className={labelCls}>Name</span><input name="name" defaultValue={c.name} className={`${inputCls} mt-1`} /></label>
                 <label><span className={labelCls}>Subtitle</span><input name="blurb" defaultValue={c.blurb ?? ""} className={`${inputCls} mt-1`} /></label>
                 <label><span className={labelCls}>Order</span><input name="sort" type="number" defaultValue={c.sort ?? 0} className={`${inputCls} mt-1`} /></label>
@@ -39,7 +39,7 @@ export default async function Categories() {
             <label className="block"><span className={labelCls}>Name</span><input name="name" required className={`${inputCls} mt-1`} placeholder="e.g. Body Mists" /></label>
             <label className="block"><span className={labelCls}>Subtitle</span><input name="blurb" className={`${inputCls} mt-1`} placeholder="Light & refreshing" /></label>
             <div className="flex gap-3">
-              <label className="block"><span className={labelCls}>Colour</span><input type="color" name="color" defaultValue="#0f3d2a" className="mt-1 h-11 w-14 rounded-lg" /></label>
+              <label className="block"><span className={labelCls}>Colour</span><input type="color" name="color" defaultValue="#1c1b19" className="mt-1 h-11 w-14 rounded-lg" /></label>
               <label className="block min-w-0 flex-1"><span className={labelCls}>Order</span><input name="sort" type="number" defaultValue={cats.length + 1} className={`${inputCls} mt-1`} /></label>
             </div>
             <button className="btn-gold min-h-11 w-full rounded-xl py-3 text-sm font-bold">Add category</button>

@@ -165,7 +165,7 @@ export async function saveCategory(form: FormData) {
     name,
     slug: slugify(String(form.get("slug") || "") || name),
     blurb: String(form.get("blurb") || "").trim().slice(0, 80),
-    color: /^#[0-9a-f]{6}$/i.test(String(form.get("color"))) ? String(form.get("color")) : "#0f3d2a",
+    color: /^#[0-9a-f]{6}$/i.test(String(form.get("color"))) ? String(form.get("color")) : "#1c1b19",
     sort: Number(form.get("sort")) || 0,
   };
   const db = await getDb();

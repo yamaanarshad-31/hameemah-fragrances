@@ -48,7 +48,7 @@ export function Header({ categories }: { categories: Cat[] }) {
     <>
       <header
         className={`sticky top-0 z-40 transition-all duration-500 ${
-          solid ? "bg-forest/95 shadow-[0_10px_40px_-20px_rgba(0,0,0,.6)] lg:bg-forest/85 lg:backdrop-blur-xl" : "bg-transparent"
+          solid ? "bg-forest/95 shadow-[0_10px_40px_-20px_rgba(0,0,0,.6)] lg:bg-forest/95 lg:backdrop-blur-xl" : "bg-transparent"
         } ${overHero ? "-mb-[76px] lg:-mb-[88px]" : ""}`}
       >
         <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between gap-2 px-2 sm:gap-4 sm:px-4 lg:h-[88px] lg:px-8">

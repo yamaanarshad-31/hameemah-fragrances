@@ -26,7 +26,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
         {isNew && <p className="mx-auto mt-3 max-w-md text-muted">We&apos;ll call or WhatsApp you shortly to confirm. Keep your order number handy: <b className="text-ink">{o.orderNo}</b></p>}
       </div>
 
-      <div className="mt-10 rounded-[2rem] bg-white p-5 shadow-[0_30px_70px_-40px_rgba(6,20,13,.5)] sm:p-8">
+      <div className="mt-10 rounded-[2rem] bg-white p-5 shadow-[0_30px_70px_-40px_rgba(10,10,9,.5)] sm:p-8">
         <OrderTimeline status={o.status ?? "pending"} />
         <ul className="mt-8 space-y-4 border-t border-ink/10 pt-6">
           {o.items.map((l, i) => (

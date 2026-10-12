@@ -85,7 +85,7 @@ export function Bottle({ color = "#b8860b", shape = 0, name, className }: { colo
 
       {/* label */}
       <g transform="translate(100 200)">
-        <rect x="-38" y="-30" width="76" height="60" rx="3" fill="#06140d" fillOpacity=".82" stroke={`url(#au${id})`} strokeWidth="1.4" />
+        <rect x="-38" y="-30" width="76" height="60" rx="3" fill="#0a0a09" fillOpacity=".82" stroke={`url(#au${id})`} strokeWidth="1.4" />
         <text y={name && name.length > 13 ? 0 : 4} textAnchor="middle" fontFamily="Georgia, serif" fontSize="26" fill={`url(#au${id})`}>H</text>
         {labelLines(name || "Hameemah").map((line, i, all) => (
           <text key={i} y={all.length > 1 ? 15.5 + i * 7.5 : 21} textAnchor="middle" fontFamily="Georgia, serif" fontSize={all.length > 1 ? 5.4 : 6.2} letterSpacing={all.length > 1 ? 0.9 : 1.4} fill="#f3dc8f">

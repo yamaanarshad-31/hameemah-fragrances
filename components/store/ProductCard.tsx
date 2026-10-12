@@ -49,9 +49,9 @@ export function ProductCard({ p, index = 0, dark = false, eager = false }: { p: 
           my.set((e.clientY - r.top) / r.height);
         }}
         onPointerLeave={() => { mx.set(0.5); my.set(0.5); }}
-        className="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] shadow-[0_20px_50px_-25px_rgba(6,20,13,.55)]"
+        className="relative aspect-[4/5] overflow-hidden rounded-[1.6rem] shadow-[0_20px_50px_-25px_rgba(10,10,9,.55)]"
       >
-        <div className="absolute inset-0" style={{ background: `radial-gradient(circle at 50% 38%, ${p.color}55, transparent 60%), linear-gradient(180deg,#155238,#06140d)` }} />
+        <div className="absolute inset-0" style={{ background: `radial-gradient(circle at 50% 38%, ${p.color}55, transparent 60%), linear-gradient(180deg,#2b2925,#0a0a09)` }} />
         <div className="absolute inset-x-8 bottom-6 top-6 rounded-full border border-gold/15 transition duration-700 group-hover:scale-110 group-hover:border-gold/40" />
         <Link href={`/product/${p.slug}`} aria-label={p.name} className="absolute inset-0">
           <ProductImage src={p.images[0]} color={p.color} shape={p.shape} name={p.name} className="transition duration-[900ms] ease-out group-hover:-translate-y-3 group-hover:scale-[1.06]" />

@@ -13,7 +13,7 @@ export function PageTitle({ title, sub, action }: { title: string; sub?: string;
 }
 
 export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`min-w-0 rounded-2xl border border-black/5 bg-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,.04),0_12px_30px_-20px_rgba(6,20,13,.25)] ${className}`}>{children}</div>;
+  return <div className={`min-w-0 rounded-2xl border border-black/5 bg-white p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,.04),0_12px_30px_-20px_rgba(10,10,9,.25)] ${className}`}>{children}</div>;
 }
 
 export function ButtonLink({ href, children }: { href: string; children: React.ReactNode }) {

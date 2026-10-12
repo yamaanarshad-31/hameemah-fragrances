@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   ...(process.env.GOOGLE_SITE_VERIFICATION ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } } : {}),
 };
 
-export const viewport: Viewport = { themeColor: "#0a2a1c" };
+export const viewport: Viewport = { themeColor: "#121211" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

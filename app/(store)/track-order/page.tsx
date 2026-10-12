@@ -23,7 +23,7 @@ export default async function Track({ searchParams }: PageProps<"/track-order">)
     <>
       <PageHero eyebrow="Order tracking" title="Where's my perfume?" sub="Enter your order number and the mobile number you used at checkout." />
       <div className="mx-auto max-w-2xl px-5 py-14">
-        <form className="grid gap-3 rounded-[2rem] bg-white p-6 shadow-[0_30px_70px_-40px_rgba(6,20,13,.5)] sm:grid-cols-[1fr_1fr_auto]">
+        <form className="grid gap-3 rounded-[2rem] bg-white p-6 shadow-[0_30px_70px_-40px_rgba(10,10,9,.5)] sm:grid-cols-[1fr_1fr_auto]">
           <input name="no" defaultValue={no} required placeholder="Order no. e.g. HF-AB12C" aria-label="Order number" className="rounded-xl border border-ink/15 px-4 py-3.5 uppercase focus:border-emerald focus:outline-none" />
           <input name="phone" defaultValue={phone} required type="tel" placeholder="0300 1234567" aria-label="Mobile number" className="rounded-xl border border-ink/15 px-4 py-3.5 focus:border-emerald focus:outline-none" />
           <button className="btn-gold rounded-xl px-6 py-3.5 text-sm font-bold uppercase tracking-widest">Track</button>

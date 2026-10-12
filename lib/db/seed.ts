@@ -71,7 +71,7 @@ const PRODUCTS: SeedProduct[] = [
 ];
 
 const CATS = [
-  { name: "For Him", slug: "men", blurb: "Bold, fresh & woody", color: "#0f3d2a", sort: 1 },
+  { name: "For Him", slug: "men", blurb: "Bold, fresh & woody", color: "#1c1b19", sort: 1 },
   { name: "For Her", slug: "women", blurb: "Floral, soft & radiant", color: "#6b2138", sort: 2 },
   { name: "Unisex", slug: "unisex", blurb: "Made to be shared", color: "#6b4a12", sort: 3 },
 ];

@@ -180,7 +180,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
         </div>
         <ul className="space-y-4">
           {reviews.map((v) => (
-            <li key={v.id} className="rounded-3xl bg-white p-5 shadow-[0_15px_40px_-30px_rgba(6,20,13,.5)] sm:p-6">
+            <li key={v.id} className="rounded-3xl bg-white p-5 shadow-[0_15px_40px_-30px_rgba(10,10,9,.5)] sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                 <p className="font-semibold">{v.name}{v.city ? <span className="font-normal text-muted"> · {v.city}</span> : null}</p>
                 <div className="flex text-gold">{[1, 2, 3, 4, 5].map((k) => <Star key={k} className={`size-4 ${k <= v.rating ? "fill-gold" : "opacity-25"}`} />)}</div>

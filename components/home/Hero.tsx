@@ -50,7 +50,7 @@ function Parallax({ x, y, className, style, children }: { x: MotionValue<number>
 
 /**
  * Home hero, after the brand's own design: the signature bottle on a marble plinth under a gold
- * arch on the right, the headline on the left. The photo melts into the dark green page on its
+ * arch on the right, the headline on the left. The photo melts into the black page on its
  * left edge; phones get a bottle-centred crop above the text.
  */
 export function Hero({ title, subtitle, freeOver, count, fromPrice }: { title: string; subtitle: string; freeOver: number; count: number; fromPrice: number }) {
@@ -70,7 +70,7 @@ export function Hero({ title, subtitle, freeOver, count, fromPrice }: { title: s
 
   return (
     <section
-      className="relative flex min-h-[100svh] flex-col overflow-hidden bg-[#0b2015] pt-20 text-cream lg:flex-row lg:items-center lg:pt-24"
+      className="relative flex min-h-[100svh] flex-col overflow-hidden bg-[#0b0b0a] pt-20 text-cream lg:flex-row lg:items-center lg:pt-24"
       onPointerMove={(e) => {
         if (lite || !isMouse(e)) return;
         mx.set((e.clientX / window.innerWidth) * 2 - 1);
@@ -90,12 +90,12 @@ export function Hero({ title, subtitle, freeOver, count, fromPrice }: { title: s
             </div>
           </Parallax>
         </div>
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0b2015] to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0b0b0a] to-transparent" />
         {/* a real shop card beside the plinth */}
         <Link
           href="/shop"
           style={{ ["--i" as string]: 1.1 }}
-          className="hero-in group absolute bottom-[14%] right-[6%] z-10 flex items-center gap-4 rounded-2xl border border-gold/30 bg-[#07170f]/70 py-3.5 pl-4 pr-3 backdrop-blur-md transition hover:border-gold/60"
+          className="hero-in group absolute bottom-[14%] right-[6%] z-10 flex items-center gap-4 rounded-2xl border border-gold/30 bg-[#080807]/70 py-3.5 pl-4 pr-3 backdrop-blur-md transition hover:border-gold/60"
         >
           <span className="relative size-14 shrink-0 overflow-hidden rounded-xl ring-1 ring-gold/30">
             <Image src="/photos/bottle-detail.webp" alt="" fill sizes="56px" className="object-cover" />
@@ -114,8 +114,8 @@ export function Hero({ title, subtitle, freeOver, count, fromPrice }: { title: s
         <div className="hero-scene absolute inset-0">
           <Scene kind="phone" sizes="(max-width:1023px) 100vw, 10px" />
         </div>
-        <div className="absolute inset-x-0 -bottom-px h-1/2 bg-gradient-to-t from-[#0b2015] via-[#0b2015]/60 to-transparent" />
-        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#0b2015] to-transparent" />
+        <div className="absolute inset-x-0 -bottom-px h-1/2 bg-gradient-to-t from-[#0b0b0a] via-[#0b0b0a]/60 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#0b0b0a] to-transparent" />
       </div>
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_20%_40%,rgba(212,175,55,.08),transparent_55%)]" />
