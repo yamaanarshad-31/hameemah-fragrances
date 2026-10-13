@@ -30,7 +30,7 @@ export default async function OrderDetail({ params }: PageProps<"/admin/orders/[
             {o.items.map((i, k) => (
               <li key={k} className="flex items-center gap-3 py-3 sm:gap-4">
                 <span className="relative h-16 w-14 shrink-0 overflow-hidden rounded-lg bg-gradient-to-b from-emerald to-forest"><ProductImage src={i.image} color={i.color} shape={i.shape} name={i.name} sizes="56px" /></span>
-                <div className="min-w-0 flex-1"><p className="font-semibold">{i.name}</p><p className="text-sm text-muted">{i.size} · {rs(i.price)} × {i.qty}</p></div>
+                <div className="min-w-0 flex-1"><p className="font-semibold">{i.name}</p><p className="text-sm text-muted">{i.size} · {rs(i.price)} × {i.qty}</p>{i.parts && <p className="text-sm text-muted">Inside: {i.parts.map((x) => `${x.name} ${x.size}`).join(" + ")}</p>}</div>
                 <p className="whitespace-nowrap font-semibold tabular-nums">{rs(i.price * i.qty)}</p>
               </li>
             ))}
@@ -39,6 +39,7 @@ export default async function OrderDetail({ params }: PageProps<"/admin/orders/[
             <div className="flex justify-between"><dt>Subtotal</dt><dd className="tabular-nums">{rs(o.subtotal)}</dd></div>
             {!!o.discount && <div className="flex justify-between text-emerald"><dt>Discount {o.coupon && `(${o.coupon})`}</dt><dd className="tabular-nums">−{rs(o.discount)}</dd></div>}
             <div className="flex justify-between"><dt>Delivery</dt><dd className="tabular-nums">{o.shipping ? rs(o.shipping) : "Free"}</dd></div>
+            {o.giftWrap && <div className="flex justify-between"><dt>Gift wrapping</dt><dd className="tabular-nums">{o.giftWrapFee ? rs(o.giftWrapFee) : "Free"}</dd></div>}
             <div className="flex justify-between pt-2 text-lg font-bold"><dt>Total</dt><dd className="tabular-nums">{rs(o.total)}</dd></div>
             <div className="flex justify-between text-muted"><dt>Payment</dt><dd>{o.payment === "bank" ? "Bank / wallet transfer" : "Cash on delivery"}</dd></div>
           </dl>
@@ -50,6 +51,12 @@ export default async function OrderDetail({ params }: PageProps<"/admin/orders/[
             <p className="break-words text-sm text-muted">{o.phone}{o.email ? ` · ${o.email}` : ""}</p>
             <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-muted">Deliver to</p>
             <p className="mt-1 text-sm">{o.address}<br />{o.city}</p>
+            {(o.giftWrap || o.giftMessage) && (
+              <div className="mt-3 rounded-lg border border-gold/50 bg-gold/10 p-2 text-sm">
+                <p className="text-xs font-semibold uppercase tracking-wider">🎁 Gift order{o.giftWrap ? " — gift wrap it" : ""}</p>
+                {o.giftMessage && <p className="mt-1 whitespace-pre-line break-words">Message for the card: “{o.giftMessage}”</p>}
+              </div>
+            )}
             {o.note && <><p className="mt-3 text-xs font-semibold uppercase tracking-wider text-muted">Note</p><p className="mt-1 rounded-lg bg-amber-50 p-2 text-sm">{o.note}</p></>}
             <div className="mt-5 grid grid-cols-2 gap-2 print:hidden">
               <a href={`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#25D366] py-2.5 text-sm font-semibold text-white"><MessageCircle className="size-4" /> WhatsApp</a>

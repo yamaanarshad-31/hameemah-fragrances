@@ -22,7 +22,6 @@ export function SettingsForm({ s }: { s: S }) {
       <Card>
         <p className="mb-4 font-semibold">Home page</p>
         <div className="space-y-4">
-          <F s={s} k="announcement" label="Announcement bar" hint="Separate messages with a | (vertical bar)." area />
           <F s={s} k="heroTitle" label="Hero headline" hint="The last two words are shown in gold." />
           <F s={s} k="heroSubtitle" label="Hero sub-text" area />
         </div>

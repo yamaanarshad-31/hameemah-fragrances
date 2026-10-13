@@ -4,7 +4,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ExternalLink, FolderTree, LayoutDashboard, LogOut, Menu, MessageSquareQuote, Package, Settings, ShoppingCart, TicketPercent, X } from "lucide-react";
+import { ExternalLink, FolderTree, LayoutDashboard, LogOut, Menu, MessageSquareQuote, Package, Settings, ShoppingCart, ToggleRight, X } from "lucide-react";
 import { logout } from "@/app/actions/admin";
 
 const NAV = [
@@ -13,7 +13,7 @@ const NAV = [
   { href: "/admin/products", label: "Products", I: Package },
   { href: "/admin/categories", label: "Categories", I: FolderTree },
   { href: "/admin/reviews", label: "Reviews", I: MessageSquareQuote, badge: "reviews" },
-  { href: "/admin/coupons", label: "Coupons", I: TicketPercent },
+  { href: "/admin/features", label: "Store Features", I: ToggleRight },
   { href: "/admin/settings", label: "Settings", I: Settings },
 ] as const;
 

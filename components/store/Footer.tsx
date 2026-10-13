@@ -12,7 +12,7 @@ function Social({ href, label, d }: { href: string; label: string; d: string }) 
   );
 }
 
-export function Footer({ settings, categories }: { settings: Settings; categories: { name: string; slug: string }[] }) {
+export function Footer({ settings, categories, extras = [] }: { settings: Settings; categories: { name: string; slug: string }[]; extras?: { href: string; label: string }[] }) {
   return (
     <footer className="grain relative overflow-hidden bg-ink text-cream">
       <div className="pointer-events-none absolute -top-40 left-1/2 h-80 w-[60rem] -translate-x-1/2 rounded-full bg-emerald/60 blur-[120px]" />
@@ -38,6 +38,7 @@ export function Footer({ settings, categories }: { settings: Settings; categorie
             <ul className="text-sm text-cream/70 lg:space-y-3">
               <li><Link className="inline-flex min-h-11 items-center hover:text-gold-2 lg:min-h-0" href="/shop">All Perfumes</Link></li>
               {categories.map((c) => <li key={c.slug}><Link className="inline-flex min-h-11 items-center hover:text-gold-2 lg:min-h-0" href={`/collections/${c.slug}`}>{c.name}</Link></li>)}
+              {extras.map((x) => <li key={x.href}><Link className="inline-flex min-h-11 items-center hover:text-gold-2 lg:min-h-0" href={x.href}>{x.label}</Link></li>)}
             </ul>
           </div>
           <div>

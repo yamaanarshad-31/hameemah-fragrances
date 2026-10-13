@@ -6,7 +6,7 @@ import { Header } from "@/components/store/Header";
 import { Intro } from "@/components/store/Intro";
 import { SmoothScroll } from "@/components/store/SmoothScroll";
 import { WhatsAppButton } from "@/components/store/WhatsAppButton";
-import { getCategories, getSettings } from "@/lib/data";
+import { featuresOf, getCategories, getSettings, liveAnnouncement } from "@/lib/data";
 import { BRAND, SITE_URL, STORE_ID, ld } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +14,9 @@ export const dynamic = "force-dynamic";
 export default async function StoreLayout({ children }: LayoutProps<"/">) {
   const [settings, cats] = await Promise.all([getSettings(), getCategories()]);
   const categories = cats.map((c) => ({ name: c.name, slug: c.slug }));
+  const f = featuresOf(settings);
+  // pages that exist only while their feature is switched on (Admin → Store Features)
+  const extras = [...(f.sale ? [{ href: "/sale", label: "Sale" }] : []), ...(f.gifts ? [{ href: "/gifts", label: "Gifts" }] : [])];
   // Placeholder social links (bare domains) are left out until real profiles are set in Admin → Settings.
   const sameAs = [settings.instagram, settings.facebook, settings.tiktok].filter((u) => u && !/^https?:\/\/(www\.)?[^/]+\/?$/.test(u));
   const siteLd = [
@@ -53,10 +56,10 @@ export default async function StoreLayout({ children }: LayoutProps<"/">) {
       <script type="application/ld+json" dangerouslySetInnerHTML={ld(siteLd)} />
       <Intro />
       <SmoothScroll />
-      <Announcement text={settings.announcement} />
-      <Header categories={categories} />
+      <Announcement messages={liveAnnouncement(settings)} />
+      <Header categories={categories} extras={extras} />
       <main id="main">{children}</main>
-      <Footer settings={settings} categories={categories} />
+      <Footer settings={settings} categories={categories} extras={extras} />
       <CartDrawer freeOver={Number(settings.freeShippingOver) || 0} />
       <WhatsAppButton number={settings.whatsapp} />
     </CartProvider>

@@ -11,7 +11,7 @@ import { useScrollLock } from "./useScrollLock";
 
 type Cat = { name: string; slug: string };
 
-export function Header({ categories }: { categories: Cat[] }) {
+export function Header({ categories, extras = [] }: { categories: Cat[]; extras?: { href: string; label: string }[] }) {
   const path = usePathname();
   const { count, setOpen, wishlist } = useCart();
   const [scrolled, setScrolled] = useState(false);
@@ -41,6 +41,7 @@ export function Header({ categories }: { categories: Cat[] }) {
   const nav = [
     { href: "/shop", label: "Shop All" },
     ...categories.slice(0, 5).map((c) => ({ href: `/collections/${c.slug}`, label: c.name })),
+    ...extras,
     { href: "/track-order", label: "Track Order" },
   ];
 

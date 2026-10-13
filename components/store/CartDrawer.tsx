@@ -67,7 +67,7 @@ export function CartDrawer({ freeOver }: { freeOver: number }) {
                     <AnimatePresence initial={false}>
                       {lines.map((l) => (
                         <motion.li key={l.productId + l.size} layout initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 60, height: 0 }} className="flex gap-3 rounded-2xl bg-white p-3 shadow-sm sm:gap-4">
-                          <Link href={`/product/${l.slug}`} onClick={() => setOpen(false)} className="relative h-24 w-20 shrink-0 overflow-hidden rounded-xl bg-gradient-to-b from-emerald to-forest">
+                          <Link href={l.giftId ? "/gifts" : `/product/${l.slug}`} onClick={() => setOpen(false)} className="relative h-24 w-20 shrink-0 overflow-hidden rounded-xl bg-gradient-to-b from-emerald to-forest">
                             <ProductImage src={l.image} color={l.color} shape={l.shape} name={l.name} sizes="80px" />
                           </Link>
                           <div className="flex min-w-0 flex-1 flex-col">

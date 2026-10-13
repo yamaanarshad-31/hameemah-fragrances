@@ -1,5 +1,7 @@
 import "server-only";
 import { mkdirSync } from "node:fs";
+import { eq } from "drizzle-orm";
+import type { Client } from "@libsql/client";
 import type { LibSQLDatabase } from "drizzle-orm/libsql";
 import * as schema from "./schema";
 import { seed } from "./seed";
@@ -29,11 +31,46 @@ const DDL = [
   `CREATE TABLE IF NOT EXISTS subscribers (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL UNIQUE, created_at INTEGER NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS images (id TEXT PRIMARY KEY, mime TEXT NOT NULL, data BLOB NOT NULL, created_at INTEGER NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS gift_sets (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, slug TEXT NOT NULL UNIQUE, description TEXT DEFAULT '', image TEXT DEFAULT '', items TEXT NOT NULL, price INTEGER NOT NULL, active INTEGER DEFAULT 1, created_at INTEGER NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS idx_products_cat ON products(category_id)`,
   `CREATE INDEX IF NOT EXISTS idx_reviews_product ON reviews(product_id)`,
 ];
 
+// Columns added after the store went live. CREATE TABLE IF NOT EXISTS leaves an existing table alone,
+// so each one is added here the first time the new code meets an older database.
+const COLUMNS: [table: string, column: string, type: string][] = [
+  ["products", "sale_percent", "INTEGER DEFAULT 0"],
+  ["products", "sale_start", "TEXT DEFAULT ''"],
+  ["products", "sale_end", "TEXT DEFAULT ''"],
+  ["coupons", "fixed", "INTEGER DEFAULT 0"],
+  ["coupons", "expires", "TEXT DEFAULT ''"],
+  ["orders", "gift_wrap", "INTEGER DEFAULT 0"],
+  ["orders", "gift_wrap_fee", "INTEGER DEFAULT 0"],
+  ["orders", "gift_message", "TEXT DEFAULT ''"],
+];
+
 export type DB = LibSQLDatabase<typeof schema>;
+
+async function migrate(client: Client, db: DB) {
+  for (const table of new Set(COLUMNS.map((c) => c[0]))) {
+    const have = new Set((await client.execute(`PRAGMA table_info(${table})`)).rows.map((r) => String(r.name)));
+    for (const [t, column, type] of COLUMNS) {
+      if (t !== table || have.has(column)) continue;
+      // another server instance may add the same column at the same moment — that one error is fine
+      await client.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`).catch((e) => {
+        if (!/duplicate column/i.test(String(e))) throw e;
+      });
+    }
+  }
+  // "Was price" used to sit beside a lowered price. Now `price` is always the regular price and the
+  // lower one is the size's sale price, so switching the Sale feature off restores the regular price.
+  const rows = await db.select({ id: schema.products.id, variants: schema.products.variants }).from(schema.products);
+  for (const p of rows) {
+    if (!p.variants.some((v) => v.compareAt != null)) continue;
+    const variants = p.variants.map(({ compareAt, ...v }) => (compareAt && compareAt > v.price ? { ...v, price: compareAt, salePrice: v.price } : v));
+    await db.update(schema.products).set({ variants }).where(eq(schema.products.id, p.id));
+  }
+}
 
 let ready: Promise<DB> | null = null;
 
@@ -43,6 +80,7 @@ export function getDb() {
     ready = (async () => {
       const { client, db } = await connect();
       await client.batch(DDL, "write");
+      await migrate(client, db);
       await seed(db);
       return db;
     })().catch((e) => {

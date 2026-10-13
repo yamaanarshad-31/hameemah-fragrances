@@ -3,6 +3,14 @@ import type { LibSQLDatabase } from "drizzle-orm/libsql";
 import * as s from "./schema";
 
 export const DEFAULT_SETTINGS: Record<string, string> = {
+  // Store Features (Admin → Store Features). "1" = on. Announcement and Sale were always part of the store, so they start on.
+  featAnnouncement: "1",
+  featSale: "1",
+  featGifts: "0",
+  featAttar: "0",
+  announcementStart: "",
+  announcementEnd: "",
+  giftWrapFee: "200",
   announcement: "Free delivery on orders above Rs. 5,000 | Cash on Delivery all over Pakistan | Use code WELCOME10 for 10% off",
   whatsapp: "923112980672",
   phone: "0311 2980672",
@@ -19,9 +27,10 @@ export const DEFAULT_SETTINGS: Record<string, string> = {
 };
 
 // Every perfume comes in 50ml and 100ml.
+// `sale` marks a starter product as discounted: the regular price is a quarter higher and b/c become the sale prices.
 const v = (b: number, c: number, sale = 0): s.Variant[] => [
-  { size: "50ml", price: b, compareAt: sale ? Math.round(b * 1.25 / 10) * 10 : null, stock: 35 },
-  { size: "100ml", price: c, compareAt: sale ? Math.round(c * 1.25 / 10) * 10 : null, stock: 20 },
+  sale ? { size: "50ml", price: Math.round(b * 1.25 / 10) * 10, salePrice: b, stock: 35 } : { size: "50ml", price: b, stock: 35 },
+  sale ? { size: "100ml", price: Math.round(c * 1.25 / 10) * 10, salePrice: c, stock: 20 } : { size: "100ml", price: c, stock: 20 },
 ];
 
 type SeedProduct = Omit<typeof s.products.$inferInsert, "createdAt" | "images" | "categoryId"> & { cat: string };
@@ -117,7 +126,8 @@ export async function seed(db: LibSQLDatabase<typeof s>) {
     const p = PRODUCTS[(i * 5) % PRODUCTS.length];
     const variant = p.variants[i % p.variants.length];
     const qty = 1 + (i % 2);
-    const subtotal = variant.price * qty;
+    const price = variant.salePrice ?? variant.price;
+    const subtotal = price * qty;
     const shipping = subtotal >= 5000 ? 0 : 250;
     return {
       orderNo: `DEMO-${1001 + i}`,
@@ -125,7 +135,7 @@ export async function seed(db: LibSQLDatabase<typeof s>) {
       phone: "03000000000",
       city: cities[i % cities.length],
       address: "Demo address",
-      items: [{ productId: pid(p.slug), name: p.name, slug: p.slug, size: variant.size, price: variant.price, qty, color: p.color, shape: p.shape }],
+      items: [{ productId: pid(p.slug), name: p.name, slug: p.slug, size: variant.size, price, qty, color: p.color, shape: p.shape }],
       subtotal,
       shipping,
       total: subtotal + shipping,

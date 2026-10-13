@@ -32,7 +32,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
           {o.items.map((l, i) => (
             <li key={i} className="flex items-center gap-3 sm:gap-4">
               <div className="relative h-16 w-14 shrink-0 overflow-hidden rounded-lg bg-gradient-to-b from-emerald to-forest"><ProductImage src={l.image} color={l.color} shape={l.shape} name={l.name} sizes="56px" /></div>
-              <div className="min-w-0 flex-1"><p className="font-semibold">{l.name}</p><p className="text-xs text-muted">{l.size} × {l.qty}</p></div>
+              <div className="min-w-0 flex-1"><p className="font-semibold">{l.name}</p><p className="text-xs text-muted">{l.size} × {l.qty}</p>{l.parts && <p className="text-xs text-muted">Inside: {l.parts.map((x) => `${x.name} ${x.size}`).join(" + ")}</p>}</div>
               <p className="whitespace-nowrap font-semibold">{rs(l.price * l.qty)}</p>
             </li>
           ))}
@@ -41,10 +41,12 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
           <div className="flex justify-between"><dt>Subtotal</dt><dd>{rs(o.subtotal)}</dd></div>
           {!!o.discount && <div className="flex justify-between text-emerald"><dt>Discount</dt><dd>−{rs(o.discount)}</dd></div>}
           <div className="flex justify-between"><dt>Delivery</dt><dd>{o.shipping ? rs(o.shipping) : "FREE"}</dd></div>
+          {o.giftWrap && <div className="flex justify-between"><dt>Gift wrapping</dt><dd>{o.giftWrapFee ? rs(o.giftWrapFee) : "FREE"}</dd></div>}
           <div className="flex justify-between font-display text-2xl"><dt>Total</dt><dd className="font-semibold text-emerald">{rs(o.total)}</dd></div>
           <div className="flex justify-between pt-2 text-muted"><dt>Payment</dt><dd>{o.payment === "bank" ? "Bank transfer / wallet" : "Cash on delivery"}</dd></div>
           <div className="flex justify-between text-muted"><dt>Delivering to</dt><dd>{o.city}</dd></div>
         </dl>
+        {o.giftMessage && <div className="mt-5 rounded-2xl bg-cream-2/60 p-4 text-sm"><p className="eyebrow !text-[0.6rem] text-gold-3">Your gift message</p><p className="mt-1 whitespace-pre-line break-words">{o.giftMessage}</p></div>}
       </div>
       <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
         <a href={`https://wa.me/${s.whatsapp}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" className="rounded-full bg-[#25D366] px-7 py-4 text-center text-sm font-bold uppercase tracking-[0.16em] text-white">Confirm on WhatsApp</a>

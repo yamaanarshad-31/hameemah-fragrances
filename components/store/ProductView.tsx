@@ -86,7 +86,7 @@ export function ProductView({ p, whatsapp }: { p: P; whatsapp: string }) {
               <div className={`absolute inset-0 ${gallery[img] ? "animate-breathe" : "animate-float"}`}><ProductImage src={gallery[img]} color={p.color} shape={p.shape} name={p.name} alt={`${p.name} – ${p.concentration ?? "perfume"} by Fragrances by Hameemah`} priority sizes="(max-width:1024px) 100vw, 50vw" /></div>
             </motion.div>
           </AnimatePresence>
-          {off > 0 && <span className="absolute left-5 top-5 rounded-full bg-gold-grad px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-ink">Save {off}%</span>}
+          {off > 0 && <span className="absolute left-5 top-5 rounded-full bg-gold-grad px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-ink">-{off}%</span>}
         </motion.div>
         {gallery.length > 1 && (
           <div className="mt-4 flex gap-3">

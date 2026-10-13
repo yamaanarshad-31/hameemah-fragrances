@@ -11,6 +11,8 @@ export type CartLine = {
   image?: string | null;
   color?: string | null;
   shape?: number | null;
+  /** set on gift-set lines (their productId is the negative gift id, see lib/pricing) */
+  giftId?: number;
 };
 
 type Ctx = {

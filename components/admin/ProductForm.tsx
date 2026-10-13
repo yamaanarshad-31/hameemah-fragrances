@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useRef, useState, useTransition } from "react";
 import { ArrowLeft, ArrowRight, ExternalLink, ImagePlus, Loader2, Plus, Trash2, X } from "lucide-react";
 import { deleteProduct, saveProduct } from "@/app/actions/admin";
@@ -8,26 +9,35 @@ import { Bottle } from "@/components/store/Bottle";
 import { Card, inputCls, labelCls } from "./ui";
 import { Toggle } from "./ProductRowActions";
 import type { Variant } from "@/lib/db/schema";
+import { rs } from "@/lib/format";
+import { pricedVariants, showDay, windowState } from "@/lib/pricing";
 
 type Cat = { id: number; name: string };
 export type Init = {
   id?: number; name: string; slug: string; tagline: string; description: string; categoryId: number | null; concentration: string;
   topNotes: string; heartNotes: string; baseNotes: string; longevity: number; sillage: number; variants: Variant[]; images: string[];
   color: string; shape: number; featured: boolean; bestseller: boolean; isNew: boolean; active: boolean;
+  salePercent: number; saleStart: string; saleEnd: string;
 };
 
 const EMPTY: Init = {
   name: "", slug: "", tagline: "", description: "", categoryId: null, concentration: "Eau de Parfum",
   topNotes: "", heartNotes: "", baseNotes: "", longevity: 4, sillage: 3,
-  variants: [{ size: "50ml", price: 2990, compareAt: null, stock: 20 }, { size: "100ml", price: 4490, compareAt: null, stock: 20 }], images: [], color: "#b8860b", shape: 0,
-  featured: false, bestseller: false, isNew: true, active: true,
+  variants: [{ size: "50ml", price: 2990, stock: 20 }, { size: "100ml", price: 4490, stock: 20 }], images: [], color: "#b8860b", shape: 0,
+  featured: false, bestseller: false, isNew: true, active: true, salePercent: 0, saleStart: "", saleEnd: "",
 };
+/** Starting point for a new attar: small oil bottles in the Attar category. */
+const attarStart = (categoryId: number): Init => ({ ...EMPTY, categoryId, concentration: "Attar (perfume oil)", variants: [{ size: "6ml", price: 1490, stock: 20 }, { size: "12ml", price: 2490, stock: 20 }] });
+
+type SaleMode = "none" | "percent" | "price";
 
 const SWATCHES = ["#5a2d0c", "#8a1f11", "#b0415b", "#e8c7c1", "#c47a12", "#d9b43a", "#0f5132", "#1d5f8a", "#3b2a5c", "#2b1d14", "#e9dcc0", "#1c1b19"];
 
-export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) {
+/** `attarCategoryId` starts a new product as an attar (see attarStart). */
+export function ProductForm({ initial, cats, saleOn = true, attarCategoryId }: { initial?: Init; cats: Cat[]; saleOn?: boolean; attarCategoryId?: number }) {
   const router = useRouter();
-  const [p, setP] = useState<Init>(initial ?? EMPTY);
+  const [p, setP] = useState<Init>(() => initial ?? (attarCategoryId ? attarStart(attarCategoryId) : EMPTY));
+  const [saleMode, setSaleMode] = useState<SaleMode>(() => ((initial?.salePercent ?? 0) > 0 ? "percent" : initial?.variants.some((v) => v.salePrice != null) ? "price" : "none"));
   const [err, setErr] = useState("");
   const [saved, setSaved] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -55,7 +65,14 @@ export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) 
 
   const save = () => start(async () => {
     setErr("");
-    const r = await saveProduct(p);
+    // only the chosen kind of sale is saved; the other kind's numbers are dropped
+    const r = await saveProduct({
+      ...p,
+      salePercent: saleMode === "percent" ? p.salePercent : 0,
+      saleStart: saleMode === "none" ? "" : p.saleStart,
+      saleEnd: saleMode === "none" ? "" : p.saleEnd,
+      variants: p.variants.map(({ salePrice, ...v }) => (saleMode === "price" && salePrice != null ? { ...v, salePrice } : v)),
+    });
     if (!r.ok) { setErr(r.error); return; }
     setSaved(true);
     if (!p.id) router.replace(`/admin/products/${r.id}`);
@@ -81,7 +98,7 @@ export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) 
             </label>
             <label><span className={labelCls}>Type</span>
               <input className={`${inputCls} mt-1.5`} list="conc" value={p.concentration ?? ""} onChange={(e) => set("concentration", e.target.value)} />
-              <datalist id="conc">{["Eau de Parfum", "Extrait de Parfum", "Eau de Toilette", "Body Mist"].map((c) => <option key={c} value={c} />)}</datalist>
+              <datalist id="conc">{["Eau de Parfum", "Extrait de Parfum", "Eau de Toilette", "Body Mist", "Attar (perfume oil)"].map((c) => <option key={c} value={c} />)}</datalist>
             </label>
             <label className="sm:col-span-2"><span className={labelCls}>Description</span><textarea rows={4} className={`${inputCls} mt-1.5`} value={p.description ?? ""} onChange={(e) => set("description", e.target.value)} placeholder="Describe how it smells and when to wear it…" /></label>
             <label className="sm:col-span-2"><span className={labelCls}>URL (leave empty to generate from name)</span>
@@ -124,20 +141,58 @@ export function ProductForm({ initial, cats }: { initial?: Init; cats: Cat[] }) 
 
         <Card>
           <p className="font-semibold">Sizes, prices & stock</p>
-          <p className="mb-4 text-sm text-muted">&quot;Was price&quot; is optional — fill it to show a sale badge.</p>
+          <p className="mb-4 text-sm text-muted">The regular price of each size. Discounts are set in the Sale box below.</p>
           <div className="space-y-3">
-            <div className="hidden grid-cols-[1fr_1fr_1fr_1fr_36px] gap-2 text-xs font-semibold uppercase tracking-wider text-ink/50 sm:grid"><span>Size</span><span>Price (Rs.)</span><span>Was price</span><span>Stock</span><span /></div>
+            <div className="hidden grid-cols-[1fr_1fr_1fr_40px] gap-2 text-xs font-semibold uppercase tracking-wider text-ink/50 sm:grid"><span>Size</span><span>Price (Rs.)</span><span>Stock</span><span /></div>
             {p.variants.map((v, i) => (
-              <div key={i} className="grid grid-cols-2 gap-2 rounded-xl bg-black/[.03] p-3 sm:grid-cols-[1fr_1fr_1fr_1fr_40px] sm:bg-transparent sm:p-0">
+              <div key={i} className="grid grid-cols-2 gap-2 rounded-xl bg-black/[.03] p-3 sm:grid-cols-[1fr_1fr_1fr_40px] sm:bg-transparent sm:p-0">
                 {/* phones stack the fields two by two, so each one carries its own caption */}
-                <label className="min-w-0"><span className={`${labelCls} mb-1 sm:hidden`}>Size</span><input aria-label="Size" className={inputCls} value={v.size} onChange={(e) => setV(i, { size: e.target.value })} placeholder="50ml" /></label>
+                <label className="col-span-2 min-w-0 sm:col-span-1"><span className={`${labelCls} mb-1 sm:hidden`}>Size</span><input aria-label="Size" className={inputCls} value={v.size} onChange={(e) => setV(i, { size: e.target.value })} placeholder="50ml" /></label>
                 <label className="min-w-0"><span className={`${labelCls} mb-1 sm:hidden`}>Price (Rs.)</span><input aria-label="Price" type="number" inputMode="numeric" min={0} className={inputCls} value={v.price} onChange={(e) => setV(i, { price: Number(e.target.value) })} /></label>
-                <label className="min-w-0"><span className={`${labelCls} mb-1 sm:hidden`}>Was price</span><input aria-label="Was price" type="number" inputMode="numeric" min={0} className={inputCls} value={v.compareAt ?? ""} onChange={(e) => setV(i, { compareAt: e.target.value ? Number(e.target.value) : null })} placeholder="—" /></label>
                 <label className="min-w-0"><span className={`${labelCls} mb-1 sm:hidden`}>Stock</span><input aria-label="Stock" type="number" inputMode="numeric" min={0} className={inputCls} value={v.stock} onChange={(e) => setV(i, { stock: Number(e.target.value) })} /></label>
                 <button type="button" disabled={p.variants.length === 1} onClick={() => set("variants", p.variants.filter((_, k) => k !== i))} className="col-span-2 flex min-h-11 items-center justify-center gap-2 rounded-xl text-sm font-medium text-muted hover:bg-red-50 hover:text-red-700 disabled:opacity-30 sm:col-span-1" aria-label="Remove size"><Trash2 className="size-4" /><span className="sm:hidden">Remove this size</span></button>
               </div>
             ))}
-            <button type="button" onClick={() => set("variants", [...p.variants, { size: ["50ml", "100ml"].find((z) => !p.variants.some((v) => v.size === z)) ?? "", price: 0, compareAt: null, stock: 0 }])} className="flex min-h-11 items-center gap-1.5 text-sm font-semibold text-emerald"><Plus className="size-4" /> Add size</button>
+            <button type="button" onClick={() => set("variants", [...p.variants, { size: (/attar/i.test(p.concentration) ? ["3ml", "6ml", "12ml"] : ["50ml", "100ml"]).find((z) => !p.variants.some((v) => v.size === z)) ?? "", price: 0, stock: 0 }])} className="flex min-h-11 items-center gap-1.5 text-sm font-semibold text-emerald"><Plus className="size-4" /> Add size</button>
+          </div>
+        </Card>
+
+        <Card>
+          <div id="sale" className="scroll-mt-20">
+            <p className="font-semibold">Sale</p>
+            <p className="mb-4 text-sm text-muted">The regular price is crossed out and a “-20%” badge is shown on the store.</p>
+            {!saleOn && saleMode !== "none" && <p className="mb-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">The Sale feature is OFF, so this sale is saved but customers still see the regular price. Turn it on in <Link href="/admin/features/sale" className="font-semibold underline">Store Features</Link>.</p>}
+            <div role="radiogroup" aria-label="Sale type" className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+              {([["none", "No sale"], ["percent", "% off all sizes"], ["price", "Sale price per size"]] as const).map(([k, l]) => (
+                <button type="button" key={k} role="radio" aria-checked={saleMode === k} onClick={() => { setSaleMode(k); setSaved(false); }} className={`min-h-11 rounded-xl border px-3 text-sm font-semibold transition ${saleMode === k ? "border-emerald bg-emerald text-cream" : "border-black/10 hover:border-emerald"}`}>{l}</button>
+              ))}
+            </div>
+            {saleMode === "percent" && (
+              <div className="mt-4">
+                <label className="block max-w-40"><span className={labelCls}>% off</span><input type="number" inputMode="numeric" min={1} max={90} className={`${inputCls} mt-1.5`} value={p.salePercent || ""} onChange={(e) => set("salePercent", Number(e.target.value))} placeholder="20" /></label>
+                {p.salePercent > 0 && <p className="mt-2 text-sm text-muted">{pricedVariants({ ...p, saleStart: "", saleEnd: "" }, true).map((v) => `${v.size}: ${rs(v.price)}`).join(" · ")}</p>}
+              </div>
+            )}
+            {saleMode === "price" && (
+              <div className="mt-4 space-y-2">
+                {p.variants.map((v, i) => (
+                  <label key={i} className="grid grid-cols-[minmax(0,1fr)_9rem] items-center gap-3">
+                    <span className="min-w-0 text-sm"><b>{v.size || "Size"}</b> <span className="text-muted">· regular {rs(v.price)}</span></span>
+                    <input aria-label={`Sale price for ${v.size}`} type="number" inputMode="numeric" min={0} className={inputCls} value={v.salePrice ?? ""} onChange={(e) => setV(i, { salePrice: e.target.value ? Number(e.target.value) : null })} placeholder="Sale price" />
+                  </label>
+                ))}
+                <p className="text-xs text-muted">Leave a size empty to keep it at its regular price.</p>
+              </div>
+            )}
+            {saleMode !== "none" && (
+              <>
+                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <label className="block min-w-0"><span className={labelCls}>Start date (optional)</span><input type="date" className={`${inputCls} mt-1.5`} value={p.saleStart} onChange={(e) => set("saleStart", e.target.value)} /></label>
+                  <label className="block min-w-0"><span className={labelCls}>End date (optional)</span><input type="date" className={`${inputCls} mt-1.5`} value={p.saleEnd} min={p.saleStart || undefined} onChange={(e) => set("saleEnd", e.target.value)} /></label>
+                </div>
+                <p className="mt-2 text-xs text-muted">{{ none: "No dates — the sale runs until you remove it.", live: `Running now${p.saleEnd ? ` until ${showDay(p.saleEnd)}` : ""}.`, scheduled: `Starts by itself on ${showDay(p.saleStart)}.`, ended: `Ended on ${showDay(p.saleEnd)} — the regular price is showing.` }[windowState(p.saleStart, p.saleEnd)]}</p>
+              </>
+            )}
           </div>
         </Card>
 

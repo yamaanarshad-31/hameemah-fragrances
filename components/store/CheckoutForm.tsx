@@ -3,11 +3,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Banknote, Landmark, Lock, Tag } from "lucide-react";
+import { Banknote, Gift, Landmark, Lock, Tag } from "lucide-react";
 import { useCart } from "./cart";
 import { ProductImage } from "./ProductImage";
 import { checkCoupon, placeOrder } from "@/app/actions/public";
 import { rs } from "@/lib/format";
+import { GIFT_SIZE, couponDiscount, couponLabel, giftLineId } from "@/lib/pricing";
 
 const CITIES = ["Karachi", "Lahore", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Quetta", "Hyderabad", "Sialkot", "Gujranwala", "Sargodha", "Bahawalpur", "Abbottabad"];
 
@@ -21,35 +22,44 @@ function Field({ label, name, error, ...rest }: { label: string; name: string; e
   );
 }
 
-export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: number; freeOver: number; bank: string }) {
+/** `coupons` and `gifts` follow the Sale and Gifts switches in Admin → Store Features. */
+export function CheckoutForm({ shippingFee, freeOver, bank, coupons, gifts, giftWrapFee }: { shippingFee: number; freeOver: number; bank: string; coupons: boolean; gifts: boolean; giftWrapFee: number }) {
   const router = useRouter();
   const { lines, subtotal, clear, ready, reprice } = useCart();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [payment, setPayment] = useState<"cod" | "bank">("cod");
   const [code, setCode] = useState("");
-  const [coupon, setCoupon] = useState<{ code: string; percent: number } | null>(null);
+  const [coupon, setCoupon] = useState<{ code: string; percent: number; fixed: number } | null>(null);
+  const [wrap, setWrap] = useState(false);
   const [couponMsg, setCouponMsg] = useState("");
   const [pending, start] = useTransition();
   const [checking, startCheck] = useTransition();
 
   // the bag keeps the price from when an item was added; refresh it so the total shown is what gets charged
-  const ids = [...new Set(lines.map((l) => l.productId))].join(",");
+  const ids = [...new Set(lines.filter((l) => !l.giftId).map((l) => l.productId))].join(",");
+  const hasGiftSets = lines.some((l) => l.giftId);
   useEffect(() => {
-    if (!ready || !ids) return;
-    fetch(`/api/products?ids=${ids}`).then((r) => r.json()).then((list: { id: number; variants: { size: string; price: number }[] }[]) => {
+    if (!ready || (!ids && !hasGiftSets)) return;
+    const get = <T,>(url: string): Promise<T[]> => fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(new Error(url))));
+    Promise.all([
+      ids ? get<{ id: number; variants: { size: string; price: number }[] }>(`/api/products?ids=${ids}`) : [],
+      hasGiftSets ? get<{ id: number; price: number }>("/api/gifts") : [],
+    ]).then(([list, sets]) => {
       const prices: Record<string, number> = {};
       for (const p of list) for (const v of p.variants) prices[`${p.id}|${v.size}`] = v.price;
+      for (const g of sets) prices[`${giftLineId(g.id)}|${GIFT_SIZE}`] = g.price;
       reprice(prices);
     }).catch(() => {});
-  }, [ready, ids, reprice]);
+  }, [ready, ids, hasGiftSets, reprice]);
 
-  const discount = coupon ? Math.round((subtotal * coupon.percent) / 100) : 0;
+  const discount = coupon ? couponDiscount(coupon, subtotal) : 0;
   const shipping = freeOver && subtotal - discount >= freeOver ? 0 : shippingFee;
-  const total = subtotal - discount + shipping;
+  const wrapFee = gifts && wrap ? giftWrapFee : 0;
+  const total = subtotal - discount + shipping + wrapFee;
 
   const apply = () => startCheck(async () => {
     const r = await checkCoupon(code, subtotal);
-    if (r.ok) { setCoupon({ code: r.code, percent: r.percent }); setCouponMsg(`${r.percent}% off applied ✦`); }
+    if (r.ok) { setCoupon({ code: r.code, percent: r.percent, fixed: r.fixed }); setCouponMsg(`${couponLabel(r)} applied ✦`); }
     else { setCoupon(null); setCouponMsg(r.msg); }
   });
 
@@ -67,7 +77,9 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
       name: String(fd.get("name")), phone: String(fd.get("phone")), email: String(fd.get("email") || ""),
       city: String(fd.get("city")), address: String(fd.get("address")), note: String(fd.get("note") || ""),
       payment, coupon: coupon?.code ?? "",
-      items: lines.map((l) => ({ productId: l.productId, size: l.size, qty: l.qty })),
+      items: lines.filter((l) => !l.giftId).map((l) => ({ productId: l.productId, size: l.size, qty: l.qty })),
+      gifts: lines.flatMap((l) => (l.giftId ? [{ id: l.giftId, qty: l.qty }] : [])),
+      giftWrap: gifts && wrap, giftMessage: gifts ? String(fd.get("giftMessage") || "") : "",
     });
     if (!r.ok) { setErrors(r.errors); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
     clear();
@@ -104,6 +116,23 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
           </div>
         </section>
 
+        {gifts && (
+          <section>
+            <h2 className="font-display text-3xl">Gift options</h2>
+            <label className={`mt-5 flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition ${wrap ? "border-emerald bg-emerald/5 ring-1 ring-emerald" : "border-ink/15 bg-white hover:border-emerald"}`}>
+              <input type="checkbox" checked={wrap} onChange={(e) => setWrap(e.target.checked)} className="mt-1 size-4 shrink-0 accent-[#1c1b19]" />
+              <Gift className="mt-0.5 size-5 shrink-0 text-gold-3" />
+              <span className="min-w-0 flex-1"><b className="block">Add gift wrapping</b><span className="text-sm text-muted">Wrapped by hand, with the price left off the parcel</span></span>
+              <span className="shrink-0 whitespace-nowrap font-semibold text-emerald">{giftWrapFee ? `+ ${rs(giftWrapFee)}` : "Free"}</span>
+            </label>
+            <label className="mt-4 block">
+              <span className="text-xs font-bold uppercase tracking-[0.14em] text-ink/70">Gift message (optional)</span>
+              <textarea name="giftMessage" rows={2} maxLength={300} aria-invalid={!!errors.giftMessage} placeholder="We'll write it on a card and place it inside the parcel" className={`mt-1.5 w-full rounded-xl border bg-white px-4 py-3 focus:outline-none ${errors.giftMessage ? "border-red-600" : "border-ink/15 focus:border-emerald"}`} />
+              {errors.giftMessage && <span className="mt-1 block text-sm text-red-700">{errors.giftMessage}</span>}
+            </label>
+          </section>
+        )}
+
         <section>
           <h2 className="font-display text-3xl">Payment</h2>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -137,19 +166,24 @@ export function CheckoutForm({ shippingFee, freeOver, bank }: { shippingFee: num
               </li>
             ))}
           </ul>
-          <div className="mt-5 flex gap-2">
-            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-ink/15 px-3 focus-within:border-emerald">
-              <Tag className="size-4 shrink-0 text-muted" />
-              <input value={code} onChange={(e) => { setCode(e.target.value.toUpperCase()); clearError("coupon"); }} placeholder="Discount code" aria-label="Discount code" className="w-full min-w-0 bg-transparent py-3 text-sm uppercase focus:outline-none" />
-            </label>
-            <button type="button" onClick={apply} disabled={!code || checking} className="min-h-11 shrink-0 rounded-xl bg-ink px-5 text-sm font-bold text-cream disabled:opacity-50">{checking ? "…" : "Apply"}</button>
-          </div>
-          {(couponMsg || errors.coupon) && <p className={`mt-2 text-sm ${coupon ? "text-emerald" : "text-red-700"}`}>{errors.coupon || couponMsg}</p>}
+          {coupons && (
+            <>
+              <div className="mt-5 flex gap-2">
+                <label className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-ink/15 px-3 focus-within:border-emerald">
+                  <Tag className="size-4 shrink-0 text-muted" />
+                  <input value={code} onChange={(e) => { setCode(e.target.value.toUpperCase()); clearError("coupon"); }} placeholder="Discount code" aria-label="Discount code" className="w-full min-w-0 bg-transparent py-3 text-sm uppercase focus:outline-none" />
+                </label>
+                <button type="button" onClick={apply} disabled={!code || checking} className="min-h-11 shrink-0 rounded-xl bg-ink px-5 text-sm font-bold text-cream disabled:opacity-50">{checking ? "…" : "Apply"}</button>
+              </div>
+              {(couponMsg || errors.coupon) && <p className={`mt-2 text-sm ${coupon && !errors.coupon ? "text-emerald" : "text-red-700"}`}>{errors.coupon || couponMsg}</p>}
+            </>
+          )}
 
           <dl className="mt-5 space-y-2 border-t border-ink/10 pt-5 text-sm">
             <div className="flex justify-between"><dt>Subtotal</dt><dd>{rs(subtotal)}</dd></div>
             {discount > 0 && <div className="flex justify-between text-emerald"><dt>Discount ({coupon?.code})</dt><dd>−{rs(discount)}</dd></div>}
             <div className="flex justify-between"><dt>Delivery</dt><dd>{shipping ? rs(shipping) : <span className="font-semibold text-emerald">FREE</span>}</dd></div>
+            {gifts && wrap && <div className="flex justify-between"><dt>Gift wrapping</dt><dd>{wrapFee ? rs(wrapFee) : <span className="font-semibold text-emerald">FREE</span>}</dd></div>}
             <div className="flex justify-between border-t border-ink/10 pt-3 font-display text-2xl"><dt>Total</dt><dd className="font-semibold text-emerald">{rs(total)}</dd></div>
           </dl>
           <button disabled={pending} className="btn-gold mt-6 w-full rounded-full px-4 py-4 text-sm font-bold uppercase tracking-[0.12em] disabled:opacity-60 sm:tracking-[0.2em]">

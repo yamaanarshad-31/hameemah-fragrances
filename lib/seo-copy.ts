@@ -42,6 +42,15 @@ const CATEGORY_COPY: Record<string, SeoCopy> = {
       "Start with a 50ml bottle or go straight to 100ml for the best value per ml. Delivered to your door in 2–4 working days anywhere in Pakistan.",
     ],
   },
+  attar: {
+    title: "Attar & Perfume Oils in Pakistan",
+    description: "Alcohol-free attar and concentrated perfume oils in small roll-on bottles. Long-lasting, rich scents with cash on delivery all over Pakistan.",
+    heading: "Attar — pure perfume oils that last",
+    body: [
+      "Attar is perfume in its most concentrated form: an alcohol-free oil that sits close to the skin and lasts for hours. A drop on the wrists and behind the ears is all it takes.",
+      "Our attars come in small bottles that are easy to carry, and are delivered with cash on delivery anywhere in Pakistan.",
+    ],
+  },
 };
 
 export function categoryCopy(c: { slug: string; name: string; blurb: string | null }): SeoCopy {
